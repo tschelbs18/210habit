@@ -1,7 +1,7 @@
 # 210habit
 Habit and Activity Tracker Web App for CSE210
 
-##Getting Started##
+## Getting Started ##
 
 1. Install Python 3
 
