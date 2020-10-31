@@ -5,7 +5,7 @@ app = Flask(__name__)
 @app.route('/')
 def hello_world():
    """Adding Docstring to satisfy github actions."""
-   return 'Hello, World!!'
+   return 'Hello, World!!!'
 
 @app.route('/team/<member>')  # i.e /team/daniel
 def team_page(member):
