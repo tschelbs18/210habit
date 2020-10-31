@@ -9,7 +9,7 @@ def hello_world():
 
 @app.route('/team/<member>')  # i.e /team/daniel
 def team_page(member):
-    """ Route for team members, each member is associated with their own route """
+    """Route for team members, each member is associated with their own route."""
     if member == "daniel":
         return "Daniel's page!"
     else:
