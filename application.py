@@ -12,6 +12,8 @@ def team_page(member):
     """Route for team members, each member is associated with their own route."""
     if member == "daniel":
         return "Daniel's page!"
+    if member == "Fan":
+        return "Fan's page!"
     else:
         return "Unknown team member: {}".format(member)
 
