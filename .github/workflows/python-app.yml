@@ -43,7 +43,7 @@ jobs:
         pydocstyle 
     
     - name: Build pdf docs
-      uses: tschelbs18/210habit@main
+      uses: ammaraskar/sphinx-action@main
       with:
         docs-folder: "docs/"
         build-command: "make pdf"
