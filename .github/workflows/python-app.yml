@@ -26,7 +26,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        sudo apt-get install rst2pdf
     
     - name: Lint with flake8
       run: |
@@ -50,7 +49,7 @@ jobs:
         build-command: "make latexpdf"
 
     - name: upload pdf artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
-        name: pdf-artifact
+        name: pdf-docs-artifact
         path: docs/build/latex/210habittracker.pdf
