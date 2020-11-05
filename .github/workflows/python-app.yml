@@ -52,4 +52,5 @@ jobs:
     - name: upload pdf artifact
       uses: actions/upload-artifact@v1
       with:
+        name: pdf-artifact
         path: docs/build/latex/210habittracker.pdf
