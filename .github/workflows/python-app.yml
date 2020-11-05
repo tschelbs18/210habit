@@ -43,12 +43,12 @@ jobs:
         pydocstyle 
     
     - name: Build pdf docs
-    - uses: tschelbs18/210habit@main
+      uses: tschelbs18/210habit@main
       with:
         docs-folder: "docs/"
         build-command: "make pdf"
 
     - name: upload pdf artifact
-    - uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v1
       with:
         path: docs/build/pdf
