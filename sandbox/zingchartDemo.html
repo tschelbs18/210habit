@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <meta charset="utf-8">
+    <title>ZingSoft Demo</title>
+	
+		<script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+</head>
+<style>
+  h2
+{
+  margin-bottom:0px;
+  padding-bottom:0px;
+}
+</style>
+  <body>
+    <h2>Jogging Activity</h2>
+    <div id='myChart'></div>
+	</body>
+<script>
+  var myConfig = {
+  type: 'calendar',
+  options: {
+    startMonth: 12, //Set the starting month (1-12).
+    endMonth: 12,
+    year: {
+      text: '2016',
+      visible: false
+    },
+    values: [
+      ['2016-12-01', 1],
+      ['2016-12-02', 1],
+      ['2016-12-05', 1]
+    ]
+  },
+   /* // pads spacing around the chart
+   plotarea: {
+    marginTop: '30%',
+    marginBottom:'40%'
+  },*/
+  /* // adds day labels to calender boxes
+     plot: {
+    valueBox: { // Use this object to configure the value boxes.
+    }
+  }*/
+};
+
+zingchart.loadModules('calendar', function(){   
+  zingchart.render({ 
+    id : 'myChart', 
+    data : myConfig, 
+    height: 250, 
+    width: '100%'
+  });
+});
+</script>
+</html>
