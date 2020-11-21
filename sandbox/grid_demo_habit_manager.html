@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ZingGrid Demo</title>
+    <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
+	<style>
+	zg-button {
+		background: var(--zg-button-background_custom);
+		border: var(--zg-button-border_custom);
+		border-radius: 4px;
+		box-shadow: var(--zg-button-box-shadow_custom);
+		color: var(--zg-button-color_custom, --zg-button-color);
+		padding: var(--zg-button-padding, 7px 9px);
+		transition: background .1s;
+	}
+	zg-button:hover {
+		--zg-icon-color: var(--zg-button-icon-background_custom_hover, #fff);
+		background: var(--zg-button-background_custom_hover);
+		border: var(--zg-button-border_custom_hover);
+		box-shadow: var(--zg-button-box-shadow_custom_hover);
+		color: var(--zg-button-color_custom_hover);
+		transition: background-color var(--zg-button-transition_speed, var(--theme-transition_speed));
+	}
+	#content {
+		max-width: 1000px;
+		margin: auto;
+	}
+
+	#loader-page {
+		opacity:    0.5; 
+		background: #000; 
+		width:      100%;
+		height:     100%; 
+		z-index:    5;
+		top:        0; 
+		left:       0; 
+		position:   fixed; 
+	}
+	#loader-spinner {
+		border: 16px solid #f3f3f3; /* Light grey */
+		border-top: 16px solid #3498db; /* Blue */
+		border-radius: 50%;
+		width: 120px;
+		height: 120px;
+		animation: spin 2s linear infinite;
+		position: absolute;
+		left: 45%;
+		top: 40%;
+		z-index: 10;
+	}
+
+	@keyframes spin {
+	  0% { transform: rotate(0deg); }
+	  100% { transform: rotate(360deg); }
+	}
+	</style>
+  </head>
+  <body>
+	<div id="content">
+		<zing-grid 
+		  caption="Log Habit"
+		  editor="modal" 
+		  layout="row" 
+		  layout-controls="disabled" 
+		  viewport-stop>
+		  <zg-colgroup>
+			<zg-column type="custom" header="Log Activity">
+			<zg-button class="log-button">
+			  <zg-icon name="submitrecord"></zg-icon><span>Log</span>
+			</zg-button>
+			</zg-column>
+			<zg-column index="habit"></zg-column>
+			<zg-column type="custom" header="Delete Habit" editor="false">
+				<zg-button action="removerecord">
+					<span>Delete Habit</span>
+				</zg-button>
+			</zg-column>
+		  </zg-colgroup>
+		</zing-grid>
+	</div>
+	<div id="loader-page">
+	</div>
+	<div id="loader-spinner"></div>
+	</body>
+
+	<script>
+
+	class HabitManager {
+		constructor(session_id, user, zg) {
+			console.log("Habit Manager constructor");
+			//this.habits = [];
+			// temporary while testing
+			this.habits = ["Running", "Working Out", "Eating Vegetables"];
+			this.session_id = session_id;
+			this.user = user;
+			this.zg = zg;
+		}
+		
+		requestHabits()
+		{
+			var mgr = this;
+			fetch('http://127.0.0.1:8080/api/habits/', {credentials: 'include'})
+			  .then(
+				function(response) {
+
+					document.getElementById('loader-page').style.display='none';
+					document.getElementById('loader-spinner').style.display='none';
+
+				  if (response.status !== 200) {
+					console.log('Looks like there was a problem. Status Code: ' +
+					  response.status);
+					return;
+				  }
+
+				  // Examine the text in the response
+				  response.json().then(function(data) {
+					console.log(data);
+					mgr.habits = data.habits;
+					mgr.renderRows(); // due to async nature, we call here
+				  });
+				}
+			  )
+			  .catch(function(err) {
+				console.log('Fetch Error :-S', err);
+
+					document.getElementById('loader-page').style.display='none';
+					document.getElementById('loader-spinner').style.display='none';
+
+					// temporary while testing
+					mgr.renderRows();
+			  });
+			
+
+		}
+
+		renderRows()
+		{
+			console.log("Updating rows with habits: "+this.habits);
+			var data = [];
+			for(var i = 0; i < this.habits.length; i++)
+			{
+				data.push({'habit':this.habits[i]});
+			}
+			this.zg.setData(data);
+		}
+
+		logHabit(habit)
+		{
+			let today = new Date()
+			var timestamp = today.toISOString().split('T')[0]
+			fetch('http://127.0.0.1:8080/api/habits/log', {
+				method: 'post',
+				headers: {
+				  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+				},
+				credentials: 'include',
+				body: 'date='+timestamp
+			  })
+			  .then(json)
+			  .then(function (data) {
+				console.log('Request succeeded with JSON response', data);
+			  })
+			  .catch(function (error) {
+				console.log('Request failed', error);
+			  });
+		}
+	}
+
+	window.addEventListener('load', (event) => {
+		const zgRef = document.querySelector('zing-grid');
+
+		let manager = new HabitManager('0','user',zgRef);
+
+		zgRef.executeOnLoad(function() {
+			manager.requestHabits();
+
+			var log_buttons = document.getElementsByClassName('log-button');
+			for (i=0; i < log_buttons.length; i++)
+			{
+				log_buttons[i].addEventListener("click", function(e) {
+					console.log(e.target);
+					var button = e.target;
+			
+					if(button.className != "log-button")
+					{
+						button = button.parentElement; // checkmark or text element in button target
+					}
+
+					button.disabled = true;
+					var habit = button.parentElement.parentElement.nextElementSibling.textContent;
+					console.log("Log clicked for habit: " + habit);
+					// todo use habit manager class to send log event for habit
+				});
+			}
+
+		});
+
+		zgRef.addEventListener('data:record:delete', (e) => {
+			console.log('Habit deleted: ' + e.detail.ZGData.data.name);
+			// todo use the habit manager class to send delete event for habit
+		});
+
+		zgRef.addEventListener('data:record:create', (e) => {
+			console.log('Habit deleted: ' + e.detail.ZGData.data.name);
+			// todo use the habit manager class to send delete event for habit
+		});
+
+	});
+	</script>
+</html>
