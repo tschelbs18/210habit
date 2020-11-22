@@ -1,3 +1,7 @@
+window.render_streak = (streak, DOMCell, $cell) => {
+	return "&#x1F525; " + String(streak)
+}
+
 /** This class manages retrieving habits from the server and rendering them in a Zing Grid on the page. */
 class HabitManager {
 	/**
@@ -11,6 +15,7 @@ class HabitManager {
 		//this.habits = [];
 		// temporary while testing
 		this.habits = ["Running", "Working Out", "Eating Vegetables"];
+		this.streaks = {"Running":13, "Working Out":7, "Eating Vegetables":2}
 		this.session_id = session_id;
 		this.user = user;
 		this.zg = zg;
@@ -102,7 +107,7 @@ class HabitManager {
 		var data = [];
 		for(var i = 0; i < this.habits.length; i++)
 		{
-			data.push({'habit':this.habits[i]});
+			data.push({'habit':this.habits[i], 'streak':this.streaks[this.habits[i]]});
 		}
 		this.zg.setData(data);
 

@@ -65,12 +65,14 @@
 		  layout-controls="disabled" 
 		  viewport-stop>
 		  <zg-colgroup>
-			<zg-column type="custom" header="Log Activity">
+			<zg-column type="custom" header="Log Habit">
 			<zg-button class="log-button">
 			  <zg-icon name="submitrecord"></zg-icon><span>Log</span>
 			</zg-button>
 			</zg-column>
 			<zg-column index="habit"></zg-column>
+			<zg-column index="streak" renderer="render_streak">
+			</zg-column>
 			<zg-column type="custom" header="Delete Habit" editor="false">
 				<zg-button action="removerecord">
 					<span>Delete Habit</span>
@@ -85,6 +87,10 @@
 	</body>
 
 	<script>
+window.render_streak = (streak, DOMCell, $cell) => {
+	return "&#x1F525; " + String(streak)
+}
+
 /** This class manages retrieving habits from the server and rendering them in a Zing Grid on the page. */
 class HabitManager {
 	/**
@@ -98,6 +104,7 @@ class HabitManager {
 		//this.habits = [];
 		// temporary while testing
 		this.habits = ["Running", "Working Out", "Eating Vegetables"];
+		this.streaks = {"Running":13, "Working Out":7, "Eating Vegetables":2}
 		this.session_id = session_id;
 		this.user = user;
 		this.zg = zg;
@@ -189,7 +196,7 @@ class HabitManager {
 		var data = [];
 		for(var i = 0; i < this.habits.length; i++)
 		{
-			data.push({'habit':this.habits[i]});
+			data.push({'habit':this.habits[i], 'streak':this.streaks[this.habits[i]]});
 		}
 		this.zg.setData(data);
 
@@ -201,15 +208,22 @@ class HabitManager {
 				console.log(e.target);
 				var button = e.target;
 		
-				if(button.className != "log-button")
+				while(button.className != "log-button")
 				{
 					button = button.parentElement; // checkmark or text element in button target
 				}
 
+				console.log('disabled button: ' + button.className);
+
 				button.disabled = true;
 				var habit = button.parentElement.parentElement.nextElementSibling.textContent;
 				console.log("Log clicked for habit: " + habit);
-				mgr.logHabit(habit);
+				mgr.logHabit(habit); // we assume this worked
+
+				// increment the streak count
+				mgr.streaks[habit] += 1;
+				var streak_elem = button.parentElement.parentElement.nextElementSibling.nextElementSibling.firstElementChild;
+				streak_elem.innerHTML = "&#x1F525; " + String(mgr.streaks[habit]);
 			});
 		}
 	}
@@ -230,7 +244,7 @@ class HabitManager {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'date='+timestamp+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'habit='+habit+'&date='+timestamp+'&user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
