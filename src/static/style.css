@@ -1,4 +1,22 @@
-/* adapted from https://codepen.io/ehermanson/pen/KwKWEv */
+/* adapted from https://codepen.io/ehermanson/pen/KwKWEv & https://codepen.io/Cheesetoast/pen/qACsJ*/
+
+#main-menu .nav-bar {
+  list-style:none;
+  margin-top: 40px;
+}
+#main-menu .nav-bar li {
+  display:inline;
+  padding:0 10px;
+}
+#main-menu .nav-bar li a {
+  text-decoration: none;
+  padding-left: 25px;
+  text-transform: uppercase;
+  color: rgb(19, 35, 47);
+}
+.nav-button {
+  font-weight: bold;
+}
 
 *, *:before, *:after {
   box-sizing: border-box;
