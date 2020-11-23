@@ -6,9 +6,37 @@
   <meta charset="utf-8">
   <title>Log Habits</title>
   <link rel="stylesheet" href="static/style.css">
+  <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
 </head>
 
 <body>
+  <div id="content">
+		<zing-grid
+		  caption="Log Habit"
+		  editor="modal"
+		  layout="row"
+		  layout-controls="disabled"
+		  viewport-stop>
+		  <zg-colgroup>
+			<zg-column type="custom" header="Log Habit">
+			<zg-button class="log-button">
+			  <zg-icon name="submitrecord"></zg-icon><span>Log</span>
+			</zg-button>
+			</zg-column>
+			<zg-column index="habit"></zg-column>
+			<zg-column index="streak" renderer="render_streak">
+			</zg-column>
+			<zg-column type="custom" header="Delete Habit" editor="false">
+				<zg-button action="removerecord">
+					<span>Delete Habit</span>
+				</zg-button>
+			</zg-column>
+		  </zg-colgroup>
+		</zing-grid>
+	</div>
+	<div id="loader-page">
+	</div>
+	<div id="loader-spinner"></div>
 </body>
 
 </html>
