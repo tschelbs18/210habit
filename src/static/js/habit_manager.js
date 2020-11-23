@@ -115,16 +115,16 @@ class HabitManager {
 		var log_buttons = document.getElementsByClassName('log-button');
 		for (i=0; i < log_buttons.length; i++)
 		{
-			log_buttons[i].addEventListener("click", function(e) {
-				console.log(e.target);
+			log_buttons[i].addEventListener("click", function handler(e) {
 				var button = e.target;
 		
-				if(button.className != "log-button")
+				while(!button.className.includes("log-button"))
 				{
 					button = button.parentElement; // checkmark or text element in button target
 				}
 
 				button.disabled = true;
+				button.removeEventListener(e.type, handler);
 				var habit = button.parentElement.parentElement.nextElementSibling.textContent;
 				console.log("Log clicked for habit: " + habit);
 				mgr.logHabit(habit);

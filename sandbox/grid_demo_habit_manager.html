@@ -204,11 +204,11 @@ class HabitManager {
 		var log_buttons = document.getElementsByClassName('log-button');
 		for (i=0; i < log_buttons.length; i++)
 		{
-			log_buttons[i].addEventListener("click", function(e) {
+			log_buttons[i].addEventListener("click", function handler(e) {
 				console.log(e.target);
 				var button = e.target;
 		
-				while(button.className != "log-button")
+				while(!button.className.includes("log-button"))
 				{
 					button = button.parentElement; // checkmark or text element in button target
 				}
@@ -216,6 +216,7 @@ class HabitManager {
 				console.log('disabled button: ' + button.className);
 
 				button.disabled = true;
+				button.removeEventListener(e.type, handler);
 				var habit = button.parentElement.parentElement.nextElementSibling.textContent;
 				console.log("Log clicked for habit: " + habit);
 				mgr.logHabit(habit); // we assume this worked
