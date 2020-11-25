@@ -1,6 +1,4 @@
 """Databse ORM models."""
-from sqlalchemy import Column, String, DateTime, Integer
-from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from habit_server.app import db
@@ -15,7 +13,7 @@ class User(db.Model, UserMixin):
 
     def set_password(self, password):
         """Set hashed password for a user.
-        
+
         :param password str: password to hash and set.
         """
         self.hashed_password = generate_password_hash(
@@ -25,7 +23,7 @@ class User(db.Model, UserMixin):
 
     def check_password(self, hashed_password):
         """Check that hashed password matches expected hashed password.
-        
+
         :param hased_password str: hashed password to check
         """
         return check_password_hash(self.hashed_password, hashed_password)

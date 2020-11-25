@@ -73,8 +73,9 @@ class DBManager():
         if not self.does_user_exist(user.username):
             return Result.Err("User does not exist, cannot get habits")
 
-        habits = \
-            self._session.query(UserHabit).filter_by(username=user.username).all()
+        habits = self._session.query(UserHabit).filter_by(
+                username=user.username
+            ).all()
 
         return Result.Ok(habits)
 
@@ -122,7 +123,7 @@ class DBManager():
         habits = self._session.query(UserHabit).filter_by(
             username=activity.username,
             habitname=activity.habitname
-        ).all() 
+        ).all()
 
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot add activity")
@@ -130,7 +131,7 @@ class DBManager():
             self._session.add(activity)
             return Result.Ok()
 
-    def get_activities(self,habit):
+    def get_activities(self, habit):
         """Get all the activities for a particular habit.
 
         :param habit UserHabit: grab all activities linked to this habit.
@@ -143,6 +144,6 @@ class DBManager():
         activities = self._session.query(UserActivity).filter_by(
             username=habit.username,
             habitname=habit.habitname
-        ).all() 
+        ).all()
 
         return Result.Ok(activities)

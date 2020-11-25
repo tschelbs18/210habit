@@ -1,6 +1,7 @@
 """Habit Server Utilities."""
 import re
 
+
 def is_valid_email_addr(addr):
     """Validate whether an email address is syntactically valid.
 
