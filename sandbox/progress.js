@@ -1,25 +1,27 @@
-//document.body.onload = renderHabitCharts;
+window.onload = function() {
+  // Load the Calendar Library immediately.
+  // Thrn render the charts as soon as the page loads.
+  zingchart.MODULESDIR = 'http://cdn.zingchart.com/modules/';
+  zingchart.loadModules('calendar', function() {
+    renderHabitCharts();
+  });
+};
 
-function getRelevantDates() {
-  var today = new Date();
-  var dd = String(today.getDate()).padStart(2, '0');
-  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-  var yyyy = today.getFullYear();
-  if (mm == '01') {
+function getRelevantDates(today) {
+  // Return the current year in YYYY string format, start and end month of the calendar view as integers.
+  // End month is the current month
+  // Get current Month as MM
+  var mm = today.getMonth() + 1;
+  // Starting month is 1 if current month is <= 2 otherwise it is 2 months prior to current month
+  if (mm <= 2) {
     var startMonth = 1;
-    var endMonth = 1;
-  } else if (mm == '02') {
-    var startMonth = 1;
-    var endMonth = 2;
   } else {
-    var startMonth = parseInt(mm) - 2;
-    var endMonth = parseInt(mm);
+    var startMonth = mm - 2;
   }
-  var dates = {'year': String(yyyy),
+  return {'year': String(today.getFullYear()),
     'startMonth': startMonth,
-    'endMonth': endMonth,
+    'endMonth': mm,
   };
-  return dates;
 }
 
 
@@ -32,47 +34,49 @@ function requestHabits() {
   - Should confirm that only 1s or 0s are coming into the values. Maybe build some logic to handle non-binary date_values
   - T30D view for multiple months?
   */
-  var user1habits = {
-    'habit': {
+  // Single habit, all in one month
+  var user1habits = [
+    {
       'name': 'Running',
       'date_values': [
-        ['2020-12-01', 1],
-        ['2020-12-02', 1],
-        ['2020-12-05', 1],
-        ['2020-12-08', 1],
-        ['2020-12-09', 1],
-        ['2020-12-14', 1],
-        ['2020-12-16', 1],
-        ['2020-12-30', 1],
-        ['2020-12-18', 1],
-        ['2020-12-29', 1],
+        ['2020-11-01', 1],
+        ['2020-11-02', 1],
+        ['2020-11-05', 1],
+        ['2020-11-08', 1],
+        ['2020-11-09', 1],
+        ['2020-11-14', 1],
+        ['2020-11-16', 1],
+        ['2020-11-30', 1],
+        ['2020-11-18', 1],
+        ['2020-11-29', 1],
       ],
     }
-  };
-  var user2habits = {
-    'habit': {
+  ];
+  // Multiple Habits with different date ranges and no data
+  var user2habits = [
+    {
       'name': 'Running',
       'date_values': [
-        ['2018-12-01', 1],
-        ['2018-12-02', 1],
-        ['2018-12-05', 1],
-        ['2018-12-08', 1],
-        ['2018-12-18', 1],
-        ['2018-12-29', 1],
+        ['2020-10-01', 1],
+        ['2020-10-02', 1],
+        ['2020-10-05', 1],
+        ['2020-11-08', 1],
+        ['2020-11-18', 1],
+        ['2020-11-29', 1],
       ],
     },
-    'habit': {
+    {
       'name': 'Reading',
       'date_values': [
-        ['2019-12-01', 1],
-        ['2019-12-09', 1],
-        ['2019-12-25', 1],
-        ['2019-12-11', 1],
-        ['2019-12-14', 1],
-        ['2019-12-17', 1],
+        ['2020-09-01', 1],
+        ['2020-09-09', 1],
+        ['2020-11-25', 1],
+        ['2020-10-11', 1],
+        ['2020-10-14', 1],
+        ['2020-10-17', 1],
       ],
     },
-    'habit': {
+    {
       'name': 'Meditating',
       'date_values': [
         ['2020-11-01', 1],
@@ -82,52 +86,72 @@ function requestHabits() {
         ['2020-09-18', 1],
         ['2020-10-29', 1],
       ]
+    },
+    {
+      'name': 'Napping',
+      'date_values': [
+      ]
     }
-  };
-  // need to handle multiple years of data being shown
-  var user3habits = {
-    'habit': {
+  ];
+  // Illogical inputs
+  var user3habits = [
+    {
       'name': 'Running',
       'date_values': [
-        ['2020-11-02', 1],
+        ['xxxx-11-02', 1],
         ['2020-11-09', 1],
-        ['2020-11-10', 1],
+        ['2020-50-10', 1],
         ['2020-11-12', 1],
         ['2020-11-13', 1],
         ['2020-11-20', 1],
-        ['2020-11-27', 1],
+        ['2020-11-99', 1],
         ['2020-11-28', 1],
         ['2020-11-29', 1],
         ['2020-11-30', 1],
         ['2020-10-05', 1],
         ['2020-10-08', 1],
-        ['2020-10-18', 1],
-        ['2020-10-29', 1],
-        ['2020-09-01', 1],
-        ['2020-09-05', 1],
-        ['2020-09-11', 1]
+        ['2020-10-18', 0],
+        ['2020-10-29', 0],
+        ['2020-09-01', 0],
+        ['2020-09-05', 0],
+        ['2020-09-11', 0]
       ],
     }
-  };
-  var user4habits = {};
-  return user3habits;
+  ];
+  var user4habits = [];
+  return user2habits;
 }
 
-function renderHabitCharts() {
-  var habits = requestHabits();
-  var dates = getRelevantDates();
-  for(var key in habits) {
-    var habitinfo = habits[key];
+async function renderHabitCharts() {
+  // Render the relevant charts for the user's habit activity over the most recent 3 months.
+  // Get the habit information for the current user.
+  var habitList = requestHabits();
+  // Get the needed date information to build the calendar.
+  var dates = getRelevantDates(new Date());
+  // Handle the case that the user has no habits yet.
+  if (habitList.length == 0) {
+    // Add a header specifying no habits yet added to the DOM.
+    var header = document.createElement("H2");
+    var headerText = document.createTextNode("No habits yet added.");
+    header.appendChild(headerText);
+    document.body.appendChild(header);
+  }
+
+  // Loop over the array of habits and add a header and chart.
+  for (i = 0; i < habitList.length; i++) {
+    var habitinfo = habitList[i];
     var habitname = habitinfo['name']
+    // Create a header element with the name of the habit
     var header = document.createElement("H2");
     var headerText = document.createTextNode(habitname);
     header.appendChild(headerText);
     document.body.appendChild(header);
+    // Create a div element in which to render that habit's chart and set the id to the name of the habit
     var div = document.createElement("div");
     div.setAttribute("id", habitname);
     document.body.appendChild(div);
+    // Build a context dictionary for configuring the chart
     var myConfig = {
-    // should find a way to add the habit name as a title at the top of each calendar
     type: 'calendar',
     options: {
       startMonth: dates['startMonth'], //Set the starting month (1-12).
@@ -151,13 +175,12 @@ function renderHabitCharts() {
       }
     } */
   };
-  zingchart.loadModules('calendar', function(){
-    zingchart.render({
-      id: habitname,
-      data: myConfig,
-      height: 250,
-      width: '60%'
-    });
+  // Render the ZingChart with the habit name for the respective div ID and current config of data.
+  zingchart.render({
+    id: habitname,
+    data: myConfig,
+    height: 250,
+    width: '60%'
   });
   }
 }
