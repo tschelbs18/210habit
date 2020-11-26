@@ -9,9 +9,7 @@ Welcome to 210HabitTracker's documentation!
 .. toctree::
    :maxdepth: 4
 
-   modules
-   app
-
+   habit_server
 
 
 
