@@ -1,9 +1,13 @@
 """Databse ORM models."""
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from habit_server.app import db
+from habit_server import db, login_manager
 
-
+@login_manager.user_loader
+def load_user(user_id):
+    user = User.query.get(user_id)
+    return user
+    
 class User(db.Model, UserMixin):
     """Database ORM model representing a User."""
 
@@ -13,6 +17,7 @@ class User(db.Model, UserMixin):
 
     def set_password(self, password):
         """Set hashed password for a user.
+
         :param password str: password to hash and set.
         """
         self.hashed_password = generate_password_hash(
@@ -22,6 +27,7 @@ class User(db.Model, UserMixin):
 
     def check_password(self, hashed_password):
         """Check that hashed password matches expected hashed password.
+
         :param hased_password str: hashed password to check
         """
         return check_password_hash(self.hashed_password, hashed_password)
