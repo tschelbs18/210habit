@@ -1,4 +1,4 @@
-/* adapted from https://codepen.io/ehermanson/pen/KwKWEv & https://codepen.io/Cheesetoast/pen/qACsJ*/
+/* adapted from https://codepen.io/ehermanson/pen/KwKWEv & https://codepen.io/Cheesetoast/pen/qACsJ & https://codepen.io/cbracco/pen/zekgx */
 
 #main-menu .nav-bar {
   list-style:none;
@@ -16,6 +16,17 @@
 }
 .nav-button {
   font-weight: bold;
+}
+
+.footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  background-color: #c1bdba;
+  color: rgb(19, 35, 47);
+  text-align: center;
 }
 
 *, *:before, *:after {
