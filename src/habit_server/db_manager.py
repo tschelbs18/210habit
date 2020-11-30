@@ -1,15 +1,14 @@
 """Database manager for the habit server."""
 from result.result import Result
-from habit_server.db_models import User, UserActivity, UserHabit
+from habit_server.db_models import User, UserActivity, UserHabit, db
 from habit_server.utils import is_valid_email_addr
-
 
 class DBManager():
     """Database Manager for habit server."""
 
     def __init__(self, session):
         """:param session : databse session object."""
-        self._session = session
+        self._session = db.session
 
     def add_user(self, user):
         """Add a new user to the database.
@@ -33,6 +32,8 @@ class DBManager():
 
         # add new user
         self._session.add(user)
+        # need to add this line otherwise changes to the database will be flushed when api call
+        self._session.commit()
         return Result.Ok()
 
     def does_user_exist(self, username):
@@ -58,9 +59,12 @@ class DBManager():
             return Result.Err("User does not exist, cannot add habit")
 
         if self.does_habit_exist(habit):
+
             return Result.Err("Habit already exists")
 
         self._session.add(habit)
+        self._session.commit()
+        print(self.does_habit_exist(habit))
         return Result.Ok()
 
     def get_habits(self, user):
@@ -70,13 +74,15 @@ class DBManager():
         :returns Result: operation result, Ok or Err
         """
         # make sure user exists
+        print(user.username)
         if not self.does_user_exist(user.username):
             return Result.Err("User does not exist, cannot get habits")
-
+        allhabits = self._session.query(UserHabit).all()
+        print(len(allhabits))
         habits = self._session.query(UserHabit).filter_by(
                 username=user.username
             ).all()
-
+        print("len is ", len(habits))
         return Result.Ok(habits)
 
     def delete_habit(self, habit):
@@ -94,7 +100,13 @@ class DBManager():
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot delete")
         else:
+            habit = self._session.query(UserHabit).filter_by(
+            username=habit.username,
+            habitname=habit.habitname
+            ).first()
+            # instance is not persisted without above operation
             self._session.delete(habit)
+            self._session.commit()
             return Result.Ok()
 
     def does_habit_exist(self, habit):
@@ -109,6 +121,7 @@ class DBManager():
         ).all()
 
         if len(habits) == 0:
+            print("habit is not there")
             return False
         else:
             return True
@@ -129,6 +142,7 @@ class DBManager():
             return Result.Err("Habit does not exist, cannot add activity")
         else:
             self._session.add(activity)
+            self._session.commit()
             return Result.Ok()
 
     def get_activities(self, habit):

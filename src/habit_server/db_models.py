@@ -1,8 +1,7 @@
 """Databse ORM models."""
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from habit_server.app import db
-
+from habit_server.__init__ import db
 
 class User(db.Model, UserMixin):
     """Database ORM model representing a User."""

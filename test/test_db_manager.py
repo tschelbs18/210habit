@@ -11,12 +11,12 @@ import time
 def create_test_app():
     """ Create a test flask app.
 
-    :return Flask: initialized test flask app 
+    :return Flask: initialized test flask app
     """
     app = Flask(__name__)
     app.config['TESTING'] = True
     # use in-memory sqllite database for testing
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     db.init_app(app)
     app.app_context().push()
 
@@ -26,7 +26,7 @@ def create_test_app():
 class DBManagerTestFixture():
     """Database manager test fixture."""
     def __enter__(self):
-        """Initialize test app, db manager, db session. 
+        """Initialize test app, db manager, db session.
 
         :return DMManager: initialized database manager.
         """
@@ -64,7 +64,7 @@ def test_add_user():
         # attempt to add duplicate user
         assert not db_man.add_user(user1).ok()
 
-        # add another valid user 
+        # add another valid user
         assert db_man.add_user(user2).ok()
 
 
@@ -157,7 +157,7 @@ def test_add_and_get_activities():
             timestamp=datetime.datetime.fromtimestamp(time.time())
         )
 
-        # attempt to add/get activities with no associated user 
+        # attempt to add/get activities with no associated user
         assert not db_man.add_activity(act1).ok()
         assert not db_man.get_activities(habit).ok()
 
