@@ -21,7 +21,8 @@ Habit and Activity Tracker Web App for CSE210
 [todo] `python test/*`
 
 6. Run the server
-`python application.py`
+`cd src` 
+`python app.py`
 
 6. Verify the server is working
 in your browser, visit 127.0.0.1:5000.
