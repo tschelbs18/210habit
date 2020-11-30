@@ -35,5 +35,12 @@ jobs:
       run: |
         pytest
     - name: Check Python DocStrings
-      run: | 
-        pydocstyle 
+      run: |
+        pydocstyle
+    - name: Js
+      uses: andstor/jsdoc-action@v1
+      with:
+        source_dir: ./src
+        output_dir: ./out
+        template: minami
+        front_page: README.md
