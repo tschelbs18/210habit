@@ -5,11 +5,20 @@
 <head>
   <meta charset="utf-8">
   <title>Log Habits</title>
+  <!-- <link rel="stylesheet" href="static/style.css"> -->
   <link rel="stylesheet" href="static/style.css">
   <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
 </head>
 
 <body>
+  <nav id="main-menu">
+    <!-- adapted from https://codepen.io/Cheesetoast/pen/qACsJ -->
+    <ul class="nav-bar">
+      <li><a href="#">Habit Tracker</a></li>
+      <li><a class="nav-button" href="#">Log</a></li>
+      <li><a class="nav-button" href="#">Progress</a></li>
+    </ul>
+  </nav>
   <div id="content">
 		<zing-grid
 		  caption="Log Habit"
@@ -37,6 +46,11 @@
 	<div id="loader-page">
 	</div>
 	<div id="loader-spinner"></div>
+
+  <div class="footer">
+    <img src="static/img/AppLogo210.png" alt="Apperature Labs logo" height="30">
+  </div>
+
 </body>
 
 </html>
