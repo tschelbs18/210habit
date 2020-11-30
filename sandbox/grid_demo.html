@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ZingGrid Demo</title>
+    <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
+	<style>
+	zg-button {
+		background: var(--zg-button-background_custom);
+		border: var(--zg-button-border_custom);
+		border-radius: 4px;
+		box-shadow: var(--zg-button-box-shadow_custom);
+		color: var(--zg-button-color_custom, --zg-button-color);
+		padding: var(--zg-button-padding, 7px 9px);
+		transition: background .1s;
+	}
+	zg-button:hover {
+		--zg-icon-color: var(--zg-button-icon-background_custom_hover, #fff);
+		background: var(--zg-button-background_custom_hover);
+		border: var(--zg-button-border_custom_hover);
+		box-shadow: var(--zg-button-box-shadow_custom_hover);
+		color: var(--zg-button-color_custom_hover);
+		transition: background-color var(--zg-button-transition_speed, var(--theme-transition_speed));
+	}
+	</style>
+  </head>
+  <body>
+    <zing-grid 
+      caption="Log Habit"
+      editor="modal" 
+      layout="row" 
+      layout-controls="disabled" 
+      viewport-stop>
+      <zg-colgroup>
+        <zg-column type="custom" header="Log Activity">
+        <zg-button class="log-button">
+          <zg-icon name="submitrecord"></zg-icon><span>Log</span>
+		</zg-button>
+        </zg-column>
+        <zg-column index="name"></zg-column>
+        <zg-column type="custom" header="Delete Habit" editor="false">
+        	<zg-button action="removerecord">
+				<span>Delete Habit</span>
+        	</zg-button>
+        </zg-column>
+      </zg-colgroup>
+    </zing-grid>
+	</body>
+
+	<script>
+	window.addEventListener('load', (event) => {
+		const zgRef = document.querySelector('zing-grid');
+		zgRef.executeOnLoad(function() {
+			zgRef.setData('[{"name":"Running"},{"name":"Working Out"},{"name":"Eating Vegetables"}]');
+
+			var log_buttons = document.getElementsByClassName('log-button');
+			for (i=0; i < log_buttons.length; i++)
+			{
+				log_buttons[i].addEventListener("click", function(e) {
+					console.log(e.target);
+					var button = e.target;
+			
+					if(button.className != "log-button")
+					{
+						button = button.parentElement; // checkmark or text element in button target
+					}
+
+					button.disabled = true;
+					var habit = button.parentElement.parentElement.nextElementSibling.textContent;
+					console.log("Log clicked for habit: " + habit);
+					// todo use habit manager class to send log event for habit
+				});
+			}
+
+		});
+
+		zgRef.addEventListener('data:record:delete', (e) => {
+			console.log('Habit deleted: ' + e.detail.ZGData.data.name);
+			// todo use the habit manager class to send delete event for habit
+		});
+
+	});
+	</script>
+</html>
