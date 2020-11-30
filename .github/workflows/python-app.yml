@@ -37,10 +37,14 @@ jobs:
     - name: Check Python DocStrings
       run: |
         pydocstyle
-    - name: Js
+    - name: jsdoc
       uses: andstor/jsdoc-action@v1
       with:
         source_dir: ./src
         output_dir: ./out
         template: minami
         front_page: README.md
+    - name: Run Jest
+      uses: stefanoeb/jest-action@1.0.3
+      with:
+        jestArgs: path/to/my.test.js
