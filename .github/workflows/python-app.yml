@@ -63,6 +63,10 @@ jobs:
         template: minami
         front_page: README.md
 
+    - name: Install Jest
+      run: |
+        npm install jest-cli
+
     - name: Run Jest
       uses: stefanoeb/jest-action@1.0.3
       with:
