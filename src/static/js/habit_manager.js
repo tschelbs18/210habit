@@ -63,12 +63,11 @@ class HabitManager {
 	}
 
 	/**
-	 * Adds or deletes the user's habit from the server.
-	 * @updateHabit
-	 * @param {string} habit - the name of the habit to delete
-	 * @param {string} action - either 'add' or 'delete' the habit
+	 * Adds the user's habit to the server.
+	 * @addHabit
+	 * @param {string} habit - the name of the habit to add
 	 */
-	updateHabit(habit, action)
+	addHabit(habit)
 	{
 		var mgr = this;
 		fetch('http://127.0.0.1:8080/api/habits/', {
@@ -77,7 +76,45 @@ class HabitManager {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'habit='+habit+'&action='+action+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'activity='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+		  })
+		  .then(
+			function(response) {
+				if (response.status !== 201) {
+				console.log('Looks like there was a problem. Status Code: ' +
+				  response.status);
+					return;
+				}
+
+				response.json().then(function(data) {
+					console.log('Request succeeded with JSON response', data);
+					var zg = document.querySelector('zing-grid');
+					zg.insertRow(        {
+						"habit": data['habit'],
+						"streak": 0
+					});
+				});
+		  })
+		  .catch(function (error) {
+			console.log('Request failed', error);
+		  });
+	}
+
+	/**
+	 * Deletes the user's habit from the server.
+	 * @deleteHabit
+	 * @param {string} habit - the name of the habit to delete
+	 */
+	deleteHabit(habit)
+	{
+		var mgr = this;
+		fetch('http://127.0.0.1:8080/api/habits/'+habit, {
+			method: 'delete',
+			headers: {
+			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+			},
+			credentials: 'include',
+			body: 'user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -148,7 +185,7 @@ class HabitManager {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'date='+timestamp+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'day_to_log='+timestamp+'&habit_name='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -179,11 +216,6 @@ window.addEventListener('load', (event) => {
 
 	zgRef.addEventListener('data:record:delete', (e) => {
 		console.log('Habit deleted: ' + e.detail.ZGData.data.habit);
-		manager.updateHabit(e.detail.ZGData.data.habit, 'delete');
-	});
-
-	zgRef.addEventListener('data:record:create', (e) => {
-		console.log('Habit created: ' + e.detail.ZGData.data.habit);
-		manager.updateHabit(e.detail.ZGData.data.habit, 'add');
+		manager.deleteHabit(e.detail.ZGData.data.habit);
 	});
 });

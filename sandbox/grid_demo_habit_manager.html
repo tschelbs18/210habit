@@ -279,10 +279,6 @@ window.addEventListener('load', (event) => {
 		manager.updateHabit(e.detail.ZGData.data.habit, 'delete');
 	});
 
-	zgRef.addEventListener('data:record:create', (e) => {
-		console.log('Habit created: ' + e.detail.ZGData.data.habit);
-		manager.updateHabit(e.detail.ZGData.data.habit, 'add');
-	});
 });
 	</script>
 </html>
