@@ -42,6 +42,19 @@ jobs:
     - name: Check Python DocStrings
       run: |
         pydocstyle
+    
+    - name: Build server pdf docs
+      uses: ammaraskar/sphinx-action@master
+      with:
+        pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended"
+        build-command: "make latexpdf"
+
+    - name: upload server docs pdf artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: pdf-docs-artifact
+        path: docs/build/latex/210habittracker.pdf
+
     - name: jsdoc
       uses: andstor/jsdoc-action@v1
       with:
@@ -49,20 +62,9 @@ jobs:
         output_dir: ./out
         template: minami
         front_page: README.md
+
     - name: Run Jest
       uses: stefanoeb/jest-action@1.0.3
       with:
         jestArgs: test/my.test.js
-      run: | 
-        pydocstyle 
-    - name: Build pdf docs
-      uses: ammaraskar/sphinx-action@master
-      with:
-        pre-build-command: "apt-get update -y && apt-get install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended"
-        build-command: "make latexpdf"
 
-    - name: upload pdf artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: pdf-docs-artifact
-        path: docs/build/latex/210habittracker.pdf
