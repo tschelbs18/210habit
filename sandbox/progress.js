@@ -1,12 +1,18 @@
+/**
+  * On page load, load the ZingChart Calendar Library immediately.
+  * Then render the charts.
+*/
 window.onload = function() {
-  // Load the Calendar Library immediately.
-  // Thrn render the charts as soon as the page loads.
   zingchart.MODULESDIR = 'http://cdn.zingchart.com/modules/';
   zingchart.loadModules('calendar', function() {
     renderHabitCharts();
   });
 };
 
+/**
+ * Return an object with the relevant dates needed to build a T3M calendar.
+ * @param {date} today - Today's date.
+*/
 function getRelevantDates(today) {
   // Return the current year in YYYY string format, start and end month of the calendar view as integers.
   // End month is the current month
@@ -24,7 +30,9 @@ function getRelevantDates(today) {
   };
 }
 
-
+/**
+ * Perform an API call to get the habit activity for the current user.
+*/
 function requestHabits() {
   // var xhr = new XMLHttpRequest();
   // xhr.open('GET', 'https://api.CSE210habit.com/user/habits', true);
@@ -122,7 +130,10 @@ function requestHabits() {
   return user2habits;
 }
 
-async function renderHabitCharts() {
+/**
+ * Takes the results of getRelevantDates and requestHabits to build a T3M chart for each of the habits logged for the current user.
+*/
+function renderHabitCharts() {
   // Render the relevant charts for the user's habit activity over the most recent 3 months.
   // Get the habit information for the current user.
   var habitList = requestHabits();
