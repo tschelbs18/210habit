@@ -1,5 +1,7 @@
 """Database manager for the habit server."""
+import datetime
 from result.result import Result
+from sqlalchemy import and_
 from habit_server.db_models import User, UserActivity, UserHabit
 from habit_server.utils import is_valid_email_addr
 
@@ -33,6 +35,8 @@ class DBManager():
 
         # add new user
         self._session.add(user)
+        self._session.commit()
+
         return Result.Ok()
 
     def does_user_exist(self, username):
@@ -61,6 +65,8 @@ class DBManager():
             return Result.Err("Habit already exists")
 
         self._session.add(habit)
+        self._session.commit()
+
         return Result.Ok()
 
     def get_habits(self, user):
@@ -75,7 +81,7 @@ class DBManager():
 
         habits = self._session.query(UserHabit).filter_by(
                 username=user.username
-            ).all()
+        ).all()
 
         return Result.Ok(habits)
 
@@ -95,6 +101,8 @@ class DBManager():
             return Result.Err("Habit does not exist, cannot delete")
         else:
             self._session.delete(habit)
+            self._session.commit()
+
             return Result.Ok()
 
     def does_habit_exist(self, habit):
@@ -129,21 +137,30 @@ class DBManager():
             return Result.Err("Habit does not exist, cannot add activity")
         else:
             self._session.add(activity)
+            self._session.commit()
+
             return Result.Ok()
 
-    def get_activities(self, habit):
+    def get_activities(self, habit, trailing_days=100):
         """Get all the activities for a particular habit.
 
         :param habit UserHabit: grab all activities linked to this habit.
+        :param trailing_days Optional[int]: filter the activities to last
+            trailing_days number of days.
         :return Result: operation result, Ok or Err
         """
         # make sure habit exists
         if not self.does_habit_exist(habit):
             return Result.Err("Habit does not exist, cannot get activities")
 
-        activities = self._session.query(UserActivity).filter_by(
-            username=habit.username,
-            habitname=habit.habitname
-        ).all()
+        end_time = datetime.datetime.now()
+        start_time = end_time - datetime.timedelta(days=trailing_days)
+
+        activities = self._session.query(UserActivity).filter(and_(
+            UserActivity.username == habit.username,
+            UserActivity.habitname == habit.habitname,
+            UserActivity.timestamp > start_time,
+            UserActivity.timestamp < end_time,
+        )).all()
 
         return Result.Ok(activities)

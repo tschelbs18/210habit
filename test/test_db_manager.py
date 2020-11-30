@@ -1,22 +1,19 @@
-from sqlalchemy import create_engine
 from habit_server.db_manager import DBManager
 from habit_server.db_models import User, UserActivity, UserHabit
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from habit_server.app import db
 import datetime
-import time
 
 
 def create_test_app():
     """ Create a test flask app.
 
-    :return Flask: initialized test flask app 
+    :return Flask: initialized test flask app
     """
     app = Flask(__name__)
     app.config['TESTING'] = True
     # use in-memory sqllite database for testing
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     db.init_app(app)
     app.app_context().push()
 
@@ -26,7 +23,7 @@ def create_test_app():
 class DBManagerTestFixture():
     """Database manager test fixture."""
     def __enter__(self):
-        """Initialize test app, db manager, db session. 
+        """Initialize test app, db manager, db session.
 
         :return DMManager: initialized database manager.
         """
@@ -64,7 +61,7 @@ def test_add_user():
         # attempt to add duplicate user
         assert not db_man.add_user(user1).ok()
 
-        # add another valid user 
+        # add another valid user
         assert db_man.add_user(user2).ok()
 
 
@@ -94,6 +91,7 @@ def test_add_habit():
         # add another habit with the same associated user
         assert db_man.add_habit(habit2).ok()
 
+
 def test_delete_habit():
     """Test the delete_habit method of the db manager."""
     with DBManagerTestFixture() as db_man:
@@ -109,9 +107,10 @@ def test_delete_habit():
 
         # add and then delete habit
         assert db_man.add_habit(habit).ok()
-        assert len(db_man.get_habits(user).unwrap())== 1
+        assert len(db_man.get_habits(user).unwrap()) == 1
         assert db_man.delete_habit(habit).ok()
-        assert len(db_man.get_habits(user).unwrap())== 0
+        assert len(db_man.get_habits(user).unwrap()) == 0
+
 
 def test_get_habits():
     """Test the get_habits method of the db manager."""
@@ -131,11 +130,11 @@ def test_get_habits():
 
         # add user, multiple habits, and grab all
         assert db_man.add_user(user).ok()
-        assert len(db_man.get_habits(user).unwrap())== 0
+        assert len(db_man.get_habits(user).unwrap()) == 0
         assert db_man.add_habit(habit1).ok()
-        assert len(db_man.get_habits(user).unwrap())== 1
+        assert len(db_man.get_habits(user).unwrap()) == 1
         assert db_man.add_habit(habit2).ok()
-        assert len(db_man.get_habits(user).unwrap())== 2
+        assert len(db_man.get_habits(user).unwrap()) == 2
 
 
 def test_add_and_get_activities():
@@ -149,15 +148,21 @@ def test_add_and_get_activities():
         act1 = UserActivity(
             username='joe@gmail.com',
             habitname='running',
-            timestamp=datetime.datetime.fromtimestamp(time.time())
+            timestamp=datetime.datetime.now()
         )
         act2 = UserActivity(
             username='joe@gmail.com',
             habitname='running',
-            timestamp=datetime.datetime.fromtimestamp(time.time())
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=50)
         )
 
-        # attempt to add/get activities with no associated user 
+        act2 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=101)
+        )
+
+        # attempt to add/get activities with no associated user
         assert not db_man.add_activity(act1).ok()
         assert not db_man.get_activities(habit).ok()
 
@@ -168,8 +173,16 @@ def test_add_and_get_activities():
 
         # add habit and associated activities and get all
         assert db_man.add_habit(habit).ok()
-        assert len(db_man.get_activities(habit).unwrap()) == 0
+        query_result = db_man.get_activities(habit, trailing_days=100)
+        assert len(query_result.unwrap()) == 0
+
         assert db_man.add_activity(act1).ok()
-        assert len(db_man.get_activities(habit).unwrap()) == 1
-        assert db_man.add_activity(act2).ok()
-        assert len(db_man.get_activities(habit).unwrap()) == 2
+        query_result = db_man.get_activities(habit, trailing_days=100)
+        assert len(query_result.unwrap()) == 1
+
+        assert db_man.add_activity(act2).ok()  # not in 100 day filter range
+        query_result = db_man.get_activities(habit, trailing_days=100)
+        assert len(query_result.unwrap()) == 1
+
+        query_result = db_man.get_activities(habit, trailing_days=200)
+        assert len(query_result.unwrap()) == 2

@@ -21,11 +21,16 @@ class User(db.Model, UserMixin):
             method='sha256'
         )
 
-    def check_password(self, hashed_password):
+    def check_password(self, password):
         """Check that hashed password matches expected hashed password.
 
-        :param hased_password str: hashed password to check
+        :param password str: password to check
         """
+        hashed_password = generate_password_hash(
+            password,
+            method='sha256'
+        )
+
         return check_password_hash(self.hashed_password, hashed_password)
 
 
