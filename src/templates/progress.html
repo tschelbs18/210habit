@@ -7,21 +7,29 @@
   <title>Progress</title>
   <link rel="stylesheet" href="static/style.css">
   <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <script src="static/js/progress.js"></script>
 </head>
 
 <body>
+  <div class='page-container'>
+    <div class='content-wrapper'>
+      <nav id="main-menu">
+        <!-- adapted from https://codepen.io/Cheesetoast/pen/qACsJ -->
+        <ul class="nav-bar">
+          <li><a href="#">Habit Tracker</a></li>
+          <li><a class="nav-button" href="#">Log</a></li>
+          <li><a class="nav-button" href="#">Progress</a></li>
+        </ul>
+      </nav>
 
-  <nav id="main-menu">
-    <!-- adapted from https://codepen.io/Cheesetoast/pen/qACsJ -->
-    <ul class="nav-bar">
-      <li><a href="#">Habit Tracker</a></li>
-      <li><a class="nav-button" href="#">Log</a></li>
-      <li><a class="nav-button" href="#">Progress</a></li>
-    </ul>
-  </nav>
+      <div id="zing-placeholder">
+      </div>
 
-  <div class="footer">
-    <img src="static/img/AppLogo210.png" alt="Apperature Labs logo" height="30">
+    </div>
+
+    <footer>
+      <img src="static/img/AppLogo210.png" alt="Apperature Labs logo" height="30">
+    </footer>
   </div>
 
 </body>
