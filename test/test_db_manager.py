@@ -187,5 +187,6 @@ def test_add_and_get_activities():
         query_result = db_man.get_activities(habit, trailing_days=200)
         assert len(query_result.unwrap()) == 2
 
-        query_result = db_man.get_activities(habit, trailing_days=None)  # no filter
+        # no date filter, get all activities
+        query_result = db_man.get_activities(habit, trailing_days=None)
         assert len(query_result.unwrap()) == 2

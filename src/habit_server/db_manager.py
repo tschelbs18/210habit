@@ -1,7 +1,6 @@
 """Database manager for the habit server."""
 import datetime
 from result.result import Result
-from sqlalchemy import and_
 from habit_server.db_models import User, UserActivity, UserHabit
 from habit_server.utils import is_valid_email_addr
 
@@ -152,7 +151,6 @@ class DBManager():
         # make sure habit exists
         if not self.does_habit_exist(habit):
             return Result.Err("Habit does not exist, cannot get activities")
-
 
         query = self._session.query(UserActivity).filter(
             UserActivity.username == habit.username,
