@@ -1,5 +1,5 @@
 """Habit Server Utilities."""
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import re
 
 
@@ -16,7 +16,7 @@ def is_valid_email_addr(addr):
 
 
 def get_activity_streak(activities):
-    """ Get the current activity streak.
+    """Get the current activity streak.
 
     An activity streak is defined as the number of previous
     days in a row an activity has been logged.
@@ -26,13 +26,16 @@ def get_activity_streak(activities):
     """
     # only conisder year, month, day of dates
     dates = [
-        datetime.strptime(act.timestamp.strftime("%Y-%m-%d"), "%Y-%m-%d") for act in activities
+        datetime.strptime(
+            act.timestamp.strftime("%Y-%m-%d"), "%Y-%m-%d"
+        ) for act in activities
     ]
 
-    # remove duplicates (it is possible that there could be two logs in a single day)
+    # remove duplicates and sort
+    # it is possible that there could be two logs in a single day
     dates = sorted(list(set(dates)), reverse=True)
 
-    today = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d") 
+    today = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
     day_to_check = today
     streak = 0
 
@@ -47,7 +50,7 @@ def get_activity_streak(activities):
             day_to_check -= timedelta(days=2)
         else:
             break
-        
+
         streak += 1
 
     return streak
