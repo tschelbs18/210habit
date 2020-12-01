@@ -174,7 +174,7 @@ textarea {
   margin-top:-20px;
   text-align:right;
 }
-
+/****** Habit Page ****************/
 zg-button {
 	background: var(--zg-button-background_custom);
 	border: var(--zg-button-border_custom);
@@ -222,3 +222,30 @@ zg-button:hover {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+#new-habit {
+	margin-right:10px;
+	margin-top:10px;
+	font-family: Roboto, verdana, sans-serif;
+	font-size:14px;
+	font-weight: 400;
+}
+
+#add {
+	padding: 6px;
+	box-shadow: 0px 0px 4px grey;
+	background-color: white;
+	border: none;
+	font-family: Roboto, verdana, sans-serif;
+	font-size:14px;
+	font-weight: 400;
+}
+
+#add:hover {
+	background-color: #0099FF;
+	color: white;
+	cursor:pointer;
+}
+	
+
+/***************************/

@@ -45,6 +45,7 @@ class HabitManager {
 			  response.json().then(function(data) {
 				console.log(data);
 				mgr.habits = data.habits;
+				mgr.streaks = data.streaks; //tbd determine format of streaks in endpoint
 				mgr.renderRows(); // due to async nature, we call here
 			  });
 			}
@@ -218,4 +219,15 @@ window.addEventListener('load', (event) => {
 		console.log('Habit deleted: ' + e.detail.ZGData.data.habit);
 		manager.deleteHabit(e.detail.ZGData.data.habit);
 	});
+	
+	// bind callback for create new habit button
+	var btn = document.getElementById('add');
+	btn.addEventListener("click", function add(e) {
+		var input = document.getElementById('new-habit');
+		if(input.value != '')
+		{
+			manager.addHabit(input.value);
+		}
+	});	
+	
 });
