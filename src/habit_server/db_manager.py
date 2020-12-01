@@ -146,21 +146,27 @@ class DBManager():
 
         :param habit UserHabit: grab all activities linked to this habit.
         :param trailing_days Optional[int]: filter the activities to last
-            trailing_days number of days.
+            trailing_days number of days. If None, get all activities
         :return Result: operation result, Ok or Err
         """
         # make sure habit exists
         if not self.does_habit_exist(habit):
             return Result.Err("Habit does not exist, cannot get activities")
 
-        end_time = datetime.datetime.now()
-        start_time = end_time - datetime.timedelta(days=trailing_days)
 
-        activities = self._session.query(UserActivity).filter(and_(
+        query = self._session.query(UserActivity).filter(
             UserActivity.username == habit.username,
             UserActivity.habitname == habit.habitname,
-            UserActivity.timestamp > start_time,
-            UserActivity.timestamp < end_time,
-        )).all()
+        )
+
+        if trailing_days is not None:
+            end_time = datetime.datetime.now()
+            start_time = end_time - datetime.timedelta(days=trailing_days)
+            query = query.filter(
+                UserActivity.timestamp > start_time,
+                UserActivity.timestamp < end_time,
+            )
+
+        activities = query.all()
 
         return Result.Ok(activities)
