@@ -63,8 +63,3 @@ jobs:
       with:
         name: js-documentation
         path: docs/build/
-        
-    - name: Run Jest
-      uses: stefanoeb/jest-action@1.0.3
-      #with:
-      #  jestArgs: test/test.js
