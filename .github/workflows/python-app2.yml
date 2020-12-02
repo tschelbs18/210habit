@@ -13,7 +13,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: "10.14"
-    - run: npm install jest
+    - run: npm install jest --global
     - uses: actions/checkout@v1
     - name: Run Jest
       uses: stefanoeb/jest-action@1.0.3
