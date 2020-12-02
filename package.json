@@ -1,6 +1,5 @@
 {
-  "name": "210habit",
-  "jest": {
-    "verbose": true
+  "scripts": {
+    "test": "jest"
   }
 }
