@@ -12,7 +12,6 @@ class User(db.Model, UserMixin):
 
     def set_password(self, password):
         """Set hashed password for a user.
-
         :param password str: password to hash and set.
         """
         self.hashed_password = generate_password_hash(
@@ -20,12 +19,11 @@ class User(db.Model, UserMixin):
             method='sha256'
         )
 
-    def check_password(self, hashed_password):
+    def check_password(self, password):
         """Check that hashed password matches expected hashed password.
-
-        :param hased_password str: hashed password to check
+        :param password str: password to check
         """
-        return check_password_hash(self.hashed_password, hashed_password)
+        return check_password_hash(self.hashed_password, password)
 
 
 class UserHabit(db.Model):

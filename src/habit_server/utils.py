@@ -16,10 +16,6 @@ def is_valid_email_addr(addr):
     else:
         return False
 
-def toDate(dateString):
-    # return datetime.datetime.strptime(dateString, "%Y-%m-%d").date()
-    return datetime.datetime.strptime(dateString, '%Y-%m-%d').date()
-
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
