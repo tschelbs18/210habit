@@ -62,5 +62,5 @@ jobs:
     - name: upload jsdocs
       uses: actions/upload-artifact@v2
       with:
-        name: jsdoc results
+        name: js-documentation
         path: docs/build/
