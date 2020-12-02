@@ -41,10 +41,9 @@ jobs:
     - name: Build JSDoc
       uses: andstor/jsdoc-action@v1
       with:
-        source_dir: ././src
+        source_dir: src
         recurse: true
-        output_dir: ././docs
-        front_page: ././README.md
+        output_dir: docs/build
     #- name: Run Jest
     #  uses: stefanoeb/jest-action@1.0.3
     #  with:
@@ -60,3 +59,8 @@ jobs:
       with:
         name: pdf-docs-artifact
         path: docs/build/latex/210habittracker.pdf
+    - name: upload jsdocs
+      uses: actions/upload-artifact@v2
+      with:
+        name: jsdoc results
+        path: docs/build/out/
