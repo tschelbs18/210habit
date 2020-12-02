@@ -45,7 +45,7 @@ jobs:
         recurse: true
         output_dir: ././docs
         template: ink-docstrap
-        template_dir: template
+        front_page: ././README.md
     #- name: Run Jest
     #  uses: stefanoeb/jest-action@1.0.3
     #  with:
