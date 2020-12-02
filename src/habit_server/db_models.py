@@ -12,6 +12,7 @@ class User(db.Model, UserMixin):
 
     def set_password(self, password):
         """Set hashed password for a user.
+
         :param password str: password to hash and set.
         """
         self.hashed_password = generate_password_hash(
@@ -25,6 +26,7 @@ class User(db.Model, UserMixin):
         :param password str: password to check
         """
         return check_password_hash(self.hashed_password, password)
+
 
 class UserHabit(db.Model):
     """Database ORM model representing a single user habit."""

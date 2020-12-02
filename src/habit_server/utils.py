@@ -18,6 +18,11 @@ def is_valid_email_addr(addr):
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
+        """unwrap Result object and serialize to Json
+
+        :param result Result: returned result of db_manager
+        :returns Json: Json object
+        """
         if isinstance(obj.__class__, DeclarativeMeta):
             # an SQLAlchemy class
             fields = {}

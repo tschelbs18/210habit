@@ -12,6 +12,7 @@ db_manager = DBManager(db.session)
 
 @login_manager.user_loader
 def load_user(username):
+    """Retrive current user"""    
     return User.get(username)
 
 @app.route('/')
@@ -21,6 +22,7 @@ def hello_world():
 
 @app.route('/api/habits', methods=['GET'])
 def get_habits():
+    """ get habits for a user.""" 
     user = User(username=session['username'], hashed_password = "")
     result = db_manager.get_habits(user)
     if result.ok():
@@ -30,6 +32,10 @@ def get_habits():
 
 @app.route('/api/habits', methods=['POST'])
 def add_habit():
+    """ add a habit.
+
+        :param habitname str: habit to add
+    """ 
     new_habit = request.json['habitname']
     print(new_habit)
     userhabit = UserHabit(username = session['username'], habitname=new_habit)
@@ -41,6 +47,10 @@ def add_habit():
 
 @app.route('/api/habits', methods=['DELETE'])
 def delete_habit():
+    """ delete a habit.
+
+        :param habitname str: habit to delete
+    """ 
     new_habit = request.json['habitname']
     userhabit = UserHabit(username = session['username'], habitname = new_habit)
     result = db_manager.delete_habit(userhabit)
@@ -51,6 +61,10 @@ def delete_habit():
 
 @app.route('/api/habits/logs', methods=['GET'])
 def get_activites():
+    """ get activities for a user.
+
+        :param habitname str: habit for the activity 
+    """ 
     data = request.json
     habitname = data['habitname']
     trailing_days = 100
@@ -65,6 +79,11 @@ def get_activites():
 
 @app.route('/api/habits/logs', methods=['POST'])
 def add_activites():
+    """ add activities for a habit.
+
+        :param habitname str: habit for the activity 
+        :param habitname str: timestamp for the activity 
+    """ 
     habitname = request.json['habitname']
     timestamp = request.json['timestamp']
     date_time = date.fromisoformat(timestamp)
@@ -77,6 +96,11 @@ def add_activites():
 
 @app.route('/login', methods = ['POST'])
 def login():
+    """ login
+
+        :param username str: username for the user 
+        :param password str: password for the user 
+    """ 
     data = request.json
     username = data.get('username', None)
     password = data.get('password', None)
@@ -88,6 +112,11 @@ def login():
 
 @app.route('/users', methods = ['POST'])
 def register():
+    """ register
+
+        :param username str: username for the user 
+        :param password str: password for the user 
+    """ 
     data = request.json
     username = data.get('username', None)
     password = data.get('password', None)
@@ -99,17 +128,19 @@ def register():
     else:
         return "register failed", 404
 
-# render
 @app.route('/login', methods=['GET'])
 def render_login():
+    """render login page""" 
     return render_template('login.html')
 
 @app.route('/habits', methods=['GET'])
 def render_habits():
+    """render habits page""" 
     return render_template('habits.html')
 
 @app.route('/progress', methods=['GET'])
 def render_progress():
+    """render progress page""" 
     return render_template('progress.html')
 
 
