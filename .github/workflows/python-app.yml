@@ -38,17 +38,14 @@ jobs:
     - name: Check Python DocStrings
       run: |
         pydocstyle
+
     - name: Build JSDoc
       uses: andstor/jsdoc-action@v1
       with:
         source_dir: src
         recurse: true
         output_dir: docs/build
-    - uses: actions/checkout@v1
-    - name: Run Jest
-      uses: stefanoeb/jest-action@1.0.3
-      #with:
-      #  jestArgs: test/test.js
+
     - name: Build pdf docs
       uses: ammaraskar/sphinx-action@master
       with:
@@ -60,8 +57,15 @@ jobs:
       with:
         name: pdf-docs-artifact
         path: docs/build/latex/210habittracker.pdf
+
     - name: upload jsdocs
       uses: actions/upload-artifact@v2
       with:
         name: js-documentation
         path: docs/build/
+        
+    - uses: actions/checkout@v1
+    - name: Run Jest
+      uses: stefanoeb/jest-action@1.0.3
+      #with:
+      #  jestArgs: test/test.js
