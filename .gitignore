@@ -2,3 +2,7 @@ build/
 __pycache__/
 *.db
 *.DS_STORE
+env/
+
+
+

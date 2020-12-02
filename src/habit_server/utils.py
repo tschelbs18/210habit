@@ -1,6 +1,9 @@
 """Habit Server Utilities."""
 import re
-
+import json
+import datetime
+from habit_server.__init__ import db
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
 def is_valid_email_addr(addr):
     """Validate whether an email address is syntactically valid.
@@ -12,3 +15,27 @@ def is_valid_email_addr(addr):
         return True
     else:
         return False
+
+class AlchemyEncoder(json.JSONEncoder):
+    """AlchemyEncoder for habit server."""
+
+    def default(self, obj):
+        """Unwrap Result object and serialize to Json.
+
+        :param result Result: returned result of db_manager
+        :returns Json: Json object
+        """
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)

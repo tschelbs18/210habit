@@ -100,7 +100,7 @@ class DBManager():
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot delete")
         else:
-            self._session.delete(habit)
+            self._session.delete(habits[0])
             self._session.commit()
 
             return Result.Ok()
