@@ -147,6 +147,7 @@ def test_add_and_get_activities():
             habitname='running',
             timestamp=datetime.datetime.now()
         )
+
         act2 = UserActivity(
             username='joe@gmail.com',
             habitname='running',

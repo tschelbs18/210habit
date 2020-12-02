@@ -21,10 +21,10 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         """Check that hashed password matches expected hashed password.
+
         :param password str: password to check
         """
         return check_password_hash(self.hashed_password, password)
-
 
 class UserHabit(db.Model):
     """Database ORM model representing a single user habit."""

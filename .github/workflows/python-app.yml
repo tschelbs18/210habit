@@ -3,11 +3,7 @@
 
 name: Python application
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -40,9 +36,19 @@ jobs:
         pytest
     
     - name: Check Python DocStrings
-      run: | 
-        pydocstyle 
-    
+      run: |
+        pydocstyle
+    #- name: jsdoc
+    #  uses: andstor/jsdoc-action@v1
+    #  with:
+    #    source_dir: ./src
+    #    output_dir: ./out
+    #    template: minami
+    #    front_page: README.md
+    #- name: Run Jest
+    #  uses: stefanoeb/jest-action@1.0.3
+    #  with:
+    #    jestArgs: test/my.test.js
     - name: Build pdf docs
       uses: ammaraskar/sphinx-action@master
       with:
