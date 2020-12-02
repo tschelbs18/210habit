@@ -1,46 +1,9 @@
 from habit_server.db_manager import DBManager
 from habit_server.db_models import User, UserActivity, UserHabit
+from DBManagerTestFixture import DBManagerTestFixture
 from flask import Flask
-from habit_server.app import db
+from habit_server.app import app, db
 import datetime
-
-
-def create_test_app():
-    """ Create a test flask app.
-
-    :return Flask: initialized test flask app
-    """
-    app = Flask(__name__)
-    app.config['TESTING'] = True
-    # use in-memory sqllite database for testing
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    db.init_app(app)
-    app.app_context().push()
-
-    return app
-
-
-class DBManagerTestFixture():
-    """Database manager test fixture."""
-    def __enter__(self):
-        """Initialize test app, db manager, db session.
-
-        :return DMManager: initialized database manager.
-        """
-        app = create_test_app()
-        with app.app_context():
-            db.create_all()
-            return DBManager(db.session)
-
-    def __exit__(self, exception_type, exception_value, traceback):
-        """ Clean up database session.
-
-        :param exception_type: unused
-        :param exception_value: unused
-        :param traceback: unused
-        """
-        db.session.remove()
-        db.drop_all()
 
 
 def test_add_user():
@@ -150,6 +113,7 @@ def test_add_and_get_activities():
             habitname='running',
             timestamp=datetime.datetime.now()
         )
+
         act2 = UserActivity(
             username='joe@gmail.com',
             habitname='running',
