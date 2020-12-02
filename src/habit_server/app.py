@@ -2,7 +2,7 @@
 import json
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 from habit_server.__init__ import app, db, login_manager
 from habit_server.db_models import User, UserActivity, UserHabit
 from habit_server.db_manager import DBManager
@@ -12,17 +12,20 @@ db_manager = DBManager(db.session)
 
 @login_manager.user_loader
 def load_user(username):
-    """Retrive current user."""    
+    """Retrive current user."""
     return User.get(username)
 
 @app.route('/')
-def hello_world():
-    """Adding Docstring to satisfy github actions."""
-    return 'Hello Habit Tracker'
+def home():
+    """Home page redirects to login if user not logged in otherwise to habits page"""
+    if session.get('username'):
+        return redirect("/habits", code=302)
+    else:
+        return redirect("/login", code=302)
 
 @app.route('/api/habits', methods=['GET'])
 def get_habits():
-    """Get habits for a user.""" 
+    """Get habits for a user."""
     user = User(username=session['username'], hashed_password = "")
     result = db_manager.get_habits(user)
     if result.ok():
@@ -35,7 +38,7 @@ def add_habit():
     """Add a habit.
 
     :param habitname str: habit to add
-    """ 
+    """
     new_habit = request.json['habitname']
     print(new_habit)
     userhabit = UserHabit(username = session['username'], habitname=new_habit)
@@ -50,7 +53,7 @@ def delete_habit():
     """Delete a habit.
 
     :param habitname str: habit to delete
-    """ 
+    """
     new_habit = request.json['habitname']
     userhabit = UserHabit(username = session['username'], habitname = new_habit)
     result = db_manager.delete_habit(userhabit)
@@ -63,8 +66,8 @@ def delete_habit():
 def get_activites():
     """Get activities for a user.
 
-    :param habitname str: habit for the activity 
-    """ 
+    :param habitname str: habit for the activity
+    """
     data = request.json
     habitname = data['habitname']
     trailing_days = 100
@@ -81,9 +84,9 @@ def get_activites():
 def add_activites():
     """Add activities for a habit.
 
-    :param habitname str: habit for the activity 
-    :param habitname str: timestamp for the activity 
-    """ 
+    :param habitname str: habit for the activity
+    :param habitname str: timestamp for the activity
+    """
     habitname = request.json['habitname']
     timestamp = request.json['timestamp']
     date_time = date.fromisoformat(timestamp)
@@ -98,9 +101,9 @@ def add_activites():
 def login():
     """Login a user.
 
-    :param username str: username for the user 
-    :param password str: password for the user 
-    """ 
+    :param username str: username for the user
+    :param password str: password for the user
+    """
     data = request.json
     username = data.get('username', None)
     password = data.get('password', None)
@@ -114,9 +117,9 @@ def login():
 def register():
     """Register a user.
 
-    :param username str: username for the user 
-    :param password str: password for the user 
-    """ 
+    :param username str: username for the user
+    :param password str: password for the user
+    """
     data = request.json
     username = data.get('username', None)
     password = data.get('password', None)
@@ -130,17 +133,17 @@ def register():
 
 @app.route('/login', methods=['GET'])
 def render_login():
-    """Render login page.""" 
+    """Render login page."""
     return render_template('login.html')
 
 @app.route('/habits', methods=['GET'])
 def render_habits():
-    """Render habits page.""" 
+    """Render habits page."""
     return render_template('habits.html')
 
 @app.route('/progress', methods=['GET'])
 def render_progress():
-    """Render progress page.""" 
+    """Render progress page."""
     return render_template('progress.html')
 
 
