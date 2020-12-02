@@ -1,9 +1,8 @@
 """Database manager for the habit server."""
 import datetime
 from result.result import Result
-from sqlalchemy import and_
 from habit_server.db_models import User, UserActivity, UserHabit
-from habit_server.utils import is_valid_email_addr
+from habit_server.utils import is_valid_email_addr, get_activity_streak
 
 
 class DBManager():
@@ -146,21 +145,41 @@ class DBManager():
 
         :param habit UserHabit: grab all activities linked to this habit.
         :param trailing_days Optional[int]: filter the activities to last
-            trailing_days number of days.
+            trailing_days number of days. If None, get all activities
         :return Result: operation result, Ok or Err
         """
         # make sure habit exists
         if not self.does_habit_exist(habit):
             return Result.Err("Habit does not exist, cannot get activities")
 
-        end_time = datetime.datetime.now()
-        start_time = end_time - datetime.timedelta(days=trailing_days)
-
-        activities = self._session.query(UserActivity).filter(and_(
+        query = self._session.query(UserActivity).filter(
             UserActivity.username == habit.username,
             UserActivity.habitname == habit.habitname,
-            UserActivity.timestamp > start_time,
-            UserActivity.timestamp < end_time,
-        )).all()
+        )
+
+        if trailing_days is not None:
+            end_time = datetime.datetime.now()
+            start_time = end_time - datetime.timedelta(days=trailing_days)
+            query = query.filter(
+                UserActivity.timestamp > start_time,
+                UserActivity.timestamp < end_time,
+            )
+
+        activities = query.all()
 
         return Result.Ok(activities)
+
+    def get_activity_streak(self, habit):
+        """Get the current activity streak for a given habit.
+
+        :param habit UserHabit: user habit to get streak for
+        :return Result: operation result, Ok or Err
+        """
+        result = self.get_activities(habit, trailing_days=None)
+
+        if not result.is_ok():
+            return result
+
+        streak = get_activity_streak(result.unwrap())
+
+        return Result.Ok(streak)
