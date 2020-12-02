@@ -17,7 +17,7 @@ class DBManagerTestFixture():
             return DBManager(db.session)
 
     def __exit__(self, exception_type, exception_value, traceback):
-        """ Clean up database session.
+        """Clean up database session.
 
         :param exception_type: unused
         :param exception_value: unused

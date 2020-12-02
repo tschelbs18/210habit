@@ -17,8 +17,10 @@ def is_valid_email_addr(addr):
         return False
 
 class AlchemyEncoder(json.JSONEncoder):
+    """AlchemyEncoder for habit server."""
+
     def default(self, obj):
-        """unwrap Result object and serialize to Json
+        """Unwrap Result object and serialize to Json.
 
         :param result Result: returned result of db_manager
         :returns Json: Json object
