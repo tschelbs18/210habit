@@ -2,10 +2,11 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from habit_server import db, login_manager
+import sys
 
 @login_manager.user_loader
 def load_user(user_id):
-    user = User.query.get(user_id)
+    user = User.query.filter_by(username=user_id).first()
     return user
     
 class User(db.Model, UserMixin):
@@ -14,7 +15,6 @@ class User(db.Model, UserMixin):
     __tablename__ = "users"
     username = db.Column(db.String, primary_key=True)
     hashed_password = db.Column(db.String)
-
     def set_password(self, password):
         """Set hashed password for a user.
 
@@ -31,6 +31,12 @@ class User(db.Model, UserMixin):
         :param hased_password str: hashed password to check
         """
         return check_password_hash(self.hashed_password, hashed_password)
+    
+    def get_id(self):
+        return self.username
+        
+    def __str__(self):
+        return str({'username': self.username, 'hashed_password': self.hashed_password})
 
 
 class UserHabit(db.Model):

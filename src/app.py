@@ -14,6 +14,10 @@ def hello_world():
     """Adding Docstring to satisfy github actions."""
     return 'Hello, World!!!'
 
+# @app.route('/test')
+# def test():
+#     """Adding Docstring to satisfy github actions."""
+#     return 'Hello, World!!!'
 
 @app.route('/team/<member>')  # i.e /team/daniel
 def team_page(member):
@@ -26,38 +30,76 @@ def team_page(member):
     else:
         return "Unknown team member: {}".format(member)
 
-@app.route('/register', methods = ['POST', 'GET'])
+@app.route('/register', methods = ['POST'])
 def register():
     """Route for register"""
     data = request.get_json()
-    scoped_session = db.create_scoped_session()
-    user = User(username = data.get('username', None), hashed_password = data.get('password', None))
-    # TODO how to user db_manager
-    # TODO db_manager might need to call 'commit' method of _session
-    res = db_manager.DBManager(scoped_session).add_user(user)
-    if res == Result.Ok:
-        return "you are registered"
-    else:
-        return "{}".format(res)
+    username = data.get('username', None)
+    hashed_password = data.get('password', None)
 
-@app.route('/login', methods = ['POST'])
+    # validation on argument
+    if not username or not hashed_password:
+        return "Invalid argument", 400
+
+    user = User(username=username, hashed_password = hashed_password)
+    scoped_session = db.create_scoped_session()
+    res = db_manager.DBManager(scoped_session).add_user(user)
+
+    if res == Result.Ok:
+        return "you are registered {}".format(user.username), 200
+    return "{}".format(res), 400
+
+@app.route('/login/', methods = ['POST'])
 def login():
     """Route for login"""
     data = request.get_json()
     username = data.get('username', None)
     hashed_password = data.get('password', None)
-    user = User.query.filter_by(username=username)
     
+    # validation on argument
+    if not username or not hashed_password:
+        return "Invalid argument", 400
+    
+    user = User.query.filter_by(username=username).first()
+    
+    # user exist and password matched
     if not user or not user.check_password(hashed_password):
-        return "logint failed"
-
+        return "User does not exist or password not matched", 400
+    
+    login_user(user)
     return flask.render_template('login.html', name=user.username)
 
-@app.route('/logout', methods = ['POST'])
+@app.route('/logout', methods = ['GET'])
 @login_required
 def logout():
     logout_user()
-    return "you are logged out"
+    return flask.redirect(flask.url_for('/'))
+
+@app.route('/test_register/<username>/<password>')
+def test_register(username, password):
+    """Route for test register"""
+    user = User(username=username, hashed_password = int(password))
+    scoped_session = db.create_scoped_session()
+    res = db_manager.DBManager(scoped_session).add_user(user)
+
+    if res == Result.Ok:
+        return "you are registered {}".format(user.username), 200
+    return "{}".format(res), 400
+
+@app.route('/test_login/<username>/<password>')
+def test_login(username, password):
+    """Route for test login"""
+    user = User.query.filter_by(username=username).first()
+    
+    # user exist and password matched
+    if not user or not user.hashed_password == password:
+        return "User does not exist or password not matched", 400
+    login_user(user)
+    return "Welcom back {}".format(user.username), 200
+
+@app.route('/current_user')
+def cur_user():
+    return "{}".format(str(current_user))
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5000, debug=True)

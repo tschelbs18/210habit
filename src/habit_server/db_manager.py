@@ -33,6 +33,7 @@ class DBManager():
 
         # add new user
         self._session.add(user)
+        self._session.commit()
         return Result.Ok()
 
     def does_user_exist(self, username):
