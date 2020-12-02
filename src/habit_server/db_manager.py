@@ -2,7 +2,7 @@
 import datetime
 from result.result import Result
 from habit_server.db_models import User, UserActivity, UserHabit
-from habit_server.utils import is_valid_email_addr
+from habit_server.utils import is_valid_email_addr, get_activity_streak
 
 
 class DBManager():
@@ -168,3 +168,18 @@ class DBManager():
         activities = query.all()
 
         return Result.Ok(activities)
+
+    def get_activity_streak(self, habit):
+        """Get the current activity streak for a given habit.
+
+        :param habit UserHabit: user habit to get streak for
+        :return Result: operation result, Ok or Err
+        """
+        result = self.get_activities(habit, trailing_days=None)
+
+        if not result.is_ok():
+            return result
+
+        streak = get_activity_streak(result.unwrap())
+
+        return Result.Ok(streak)
