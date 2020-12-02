@@ -63,3 +63,10 @@ jobs:
       with:
         name: js-documentation
         path: docs/build/
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - run: npm install jest --global
+    - run: npm run test
