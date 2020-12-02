@@ -102,15 +102,15 @@ def register():
 # render
 @app.route('/login', methods=['GET'])
 def render_login():
-    return render_template('login.html', name=user.username)
+    return render_template('login.html')
 
 @app.route('/habits', methods=['GET'])
 def render_habits():
-    return render_template('habits.html', name=user.username)
+    return render_template('habits.html')
 
 @app.route('/progress', methods=['GET'])
 def render_progress():
-    return render_template('progress.html', name=user.username)
+    return render_template('progress.html')
 
 
 if __name__ == '__main__':
