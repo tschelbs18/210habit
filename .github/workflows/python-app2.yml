@@ -9,11 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js 10.14
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: "10.14"
+        node-version: 14.x
     - run: npm install jest --global
-    - uses: actions/checkout@v1
-    - name: Run Jest
-      uses: stefanoeb/jest-action@1.0.3
+    - run: jest test/test.js
