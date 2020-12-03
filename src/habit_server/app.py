@@ -18,11 +18,6 @@ def load_user(username):
     """Retrive current user."""    
     return User.query.get(username)
 
-@app.route('/')
-def hello_world():
-    """Adding Docstring to satisfy github actions."""
-    return 'Hello Habit Tracker'
-
 @app.route('/api/habits', methods=['GET'])
 def get_habits():
     """Get habits for a user.""" 
@@ -32,13 +27,12 @@ def get_habits():
         return "cannot get habits", 400
 
     habits = result.unwrap()
-
-    return_dict = {'habits':[], 'streaks':[]}
+    resp_data = {'habits':[], 'streaks':[]}
     for habit in habits:
-        return_dict['habits'].append(habit.habitname)
-        return_dict['streaks'].append(db_manager.get_activity_streak(habit).unwrap())
+        resp_data['habits'].append(habit.habitname)
+        resp_data['streaks'].append(db_manager.get_activity_streak(habit).unwrap())
 
-    return json.dumps(return_dict), 200
+    return json.dumps(resp_data), 200
 
 @app.route('/api/habits', methods=['POST'])
 def add_habit():
@@ -55,14 +49,16 @@ def add_habit():
     else:
         return "cannot add habit ", 404
 
-@app.route('/api/habits', methods=['DELETE'])
-def delete_habit():
+@app.route('/api/habits/<habitname>', methods=['DELETE'])
+def delete_habit(habitname):
     """Delete a habit.
 
     :param habitname str: habit to delete
     """ 
-    new_habit = request.json['habitname']
-    userhabit = UserHabit(username = session['username'], habitname = new_habit)
+    userhabit = UserHabit(
+        username=flask_login.current_user.username,
+        habitname=habitname
+    )
     result = db_manager.delete_habit(userhabit)
     if result.is_ok():
         return "delete habit successful", 200
@@ -94,10 +90,14 @@ def add_activites():
     :param habitname str: habit for the activity 
     :param habitname str: timestamp for the activity 
     """ 
-    habitname = request.json['habitname']
-    timestamp = request.json['timestamp']
-    date_time = date.fromisoformat(timestamp)
-    activity = UserActivity(username = session['username'], habitname = habitname, timestamp = date_time)
+    timestamp = date.fromisoformat(
+        request.form['day_to_log']
+    )
+    activity = UserActivity(
+        username = flask_login.current_user.username,
+        habitname = request.form['habitname'],
+        timestamp = timestamp
+    )
     result = db_manager.add_activity(activity)
     if result.is_ok():
         return "add activity successful", 200
@@ -119,9 +119,6 @@ def login():
         return "login failed", 404
     session['username'] = username
     login_user(user)
-    flash('Logged in successfully!!!')
-    # return render_template('login.html', name=user.username)
-    # return "login successful", 200
     return redirect(url_for('render_habits'))
 
 @app.route('/api/users', methods = ['POST'])
@@ -142,6 +139,7 @@ def register():
     else:
         return "register failed", 404
 
+@app.route('/', methods=['GET'])
 @app.route('/login', methods=['GET'])
 def render_login():
     """Render login page.""" 

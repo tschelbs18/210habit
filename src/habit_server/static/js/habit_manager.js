@@ -36,7 +36,6 @@ class HabitManager {
 		this.session_id = session_id;
 		this.user = user;
 		this.zg = zg;
-		this.renderRows = this.renderRows.bind(this)
 		this.habits = [];
 	}
 
@@ -163,7 +162,6 @@ class HabitManager {
 	 */
 	renderRows()
 	{
-		// this.habits = [];
 		console.log("Updating rows with habits: "+this.habits);
 		var mgr = this;
 		var data = [];
@@ -193,13 +191,13 @@ class HabitManager {
 		let today = new Date()
 		var timestamp = today.toISOString().split('T')[0] // YYYY-MM-DD format
 		var mgr = this;
-		fetch('http://127.0.0.1:5000/api/habits/log', {
+		fetch('http://127.0.0.1:5000/api/habits/logs', {
 			method: 'post',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'day_to_log='+timestamp+'&habit_name='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'day_to_log='+timestamp+'&habitname='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -209,9 +207,7 @@ class HabitManager {
 				return;
 				}
 
-				response.json().then(function(data) {
-					console.log('Request succeeded with JSON response', data);
-				});
+				console.log('Successfull activity post:', habit, timestamp);
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);
