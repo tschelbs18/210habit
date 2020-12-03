@@ -17,8 +17,10 @@ sys.path.insert(0, os.path.abspath('../../src'))
 # -- Project information -----------------------------------------------------
 
 project = '210HabitTracker'
-copyright = '2020, Jared Buchanan, Daniel Koohmarey, Fan Wu, Li Yang, Ted Schelble, Zhongdao Ren'
-author = 'Jared Buchanan, Daniel Koohmarey, Fan Wu, Li Yang, Ted Schelble, Zhongdao Ren'
+copyright = """2020, Jared Buchanan, Daniel Koohmarey,
+            'Fan Wu, Li Yang, Ted Schelble, Zhongdao Ren """
+author = """Jared Buchanan, Daniel Koohmarey, Fan Wu,
+         Li Yang, Ted Schelble, Zhongdao Ren"""
 
 
 # -- General configuration ---------------------------------------------------
