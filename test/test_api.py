@@ -1,11 +1,6 @@
-import os
-import uuid
-import pytest
-from flask import Flask, session, json
-from sqlalchemy import create_engine
-from src.db_models import User, UserActivity, UserHabit
+from flask import json
 from test.DBManagerTestFixture import DBManagerTestFixture
-from app import app, db
+from app import app
 
 
 def test_user():

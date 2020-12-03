@@ -1,7 +1,6 @@
 """Habit Tracker Web Server entry point."""
 import json
 from datetime import date
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, session, redirect
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
@@ -33,7 +32,7 @@ def load_user(username):
 
 @app.route('/')
 def home():
-    """Home page redirects to login if user not logged in otherwise to habits page."""
+    """Redirects to login if user not logged in otherwise to habits page."""
     if session.get('username'):
         return redirect("/habits", code=302)
     else:
