@@ -2,6 +2,7 @@ from src.db_models import User, UserActivity, UserHabit
 from test.DBManagerTestFixture import DBManagerTestFixture
 import datetime
 
+
 def test_add_user():
     """Test the add_user method of the db manager."""
     with DBManagerTestFixture() as db_man:
