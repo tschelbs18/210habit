@@ -1,5 +1,5 @@
-from habit_server.db_models import User, UserActivity, UserHabit
-from DBManagerTestFixture import DBManagerTestFixture
+from src.db_models import User, UserActivity, UserHabit
+from test.DBManagerTestFixture import DBManagerTestFixture
 import datetime
 
 

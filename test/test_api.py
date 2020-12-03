@@ -1,6 +1,6 @@
 from flask import json
-from habit_server.app import app
-from DBManagerTestFixture import DBManagerTestFixture
+from test.DBManagerTestFixture import DBManagerTestFixture
+from app import app
 
 
 def test_user():

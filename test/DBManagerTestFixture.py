@@ -1,6 +1,6 @@
 """DBManagerTestFixture for the habit server."""
-from habit_server.__init__ import app, db
-from habit_server.db_manager import DBManager
+from src.db_manager import DBManager
+from app import app, db
 
 
 class DBManagerTestFixture():

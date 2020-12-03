@@ -1,11 +1,25 @@
 """Habit Tracker Web Server entry point."""
 import json
 from datetime import date
-from flask import render_template, request, session
-from habit_server.__init__ import app, db, login_manager
-from habit_server.db_models import User, UserActivity, UserHabit
-from habit_server.db_manager import DBManager
-from habit_server.utils import AlchemyEncoder
+from flask import Flask, render_template, request, session, redirect
+from src.db_models import User, UserActivity, UserHabit, db
+from src.db_manager import DBManager
+from src.utils import AlchemyEncoder
+from flask_login import LoginManager
+import os
+import uuid
+
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+    os.path.join(basedir, 'db.sqlite')
+app.config['SECRET_KEY'] = uuid.uuid4().hex
+db.init_app(app)
+app.app_context().push()
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 db_manager = DBManager(db.session)
 
@@ -17,9 +31,12 @@ def load_user(username):
 
 
 @app.route('/')
-def hello_world():
-    """Adding Docstring to satisfy github actions."""
-    return 'Hello Habit Tracker'
+def home():
+    """Redirects to login if user not logged in otherwise to habits page."""
+    if session.get('username'):
+        return redirect("/habits", code=302)
+    else:
+        return redirect("/login", code=302)
 
 
 @app.route('/api/habits', methods=['GET'])
