@@ -10,7 +10,7 @@ from flask_login import LoginManager
 import os
 import uuid
 
-app = Flask(__name__, template_folder="src/templates/", static_folder="src/static")
+app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
