@@ -1,4 +1,5 @@
 """Databse ORM models."""
+from werkzeug import useragents
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from habit_server.__init__ import db
@@ -26,6 +27,10 @@ class User(db.Model, UserMixin):
         :param password str: password to check
         """
         return check_password_hash(self.hashed_password, password)
+
+    def get_id(self):
+        return self.username
+
 
 
 class UserHabit(db.Model):
