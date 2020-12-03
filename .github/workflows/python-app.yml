@@ -32,7 +32,6 @@ jobs:
 
     - name: Test with pytest
       run: |
-        source setup_pythonpath.sh
         pytest
 
     - name: Check Python DocStrings
