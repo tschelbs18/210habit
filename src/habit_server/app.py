@@ -1,14 +1,13 @@
 """Habit Tracker Web Server entry point."""
 import json
 from datetime import date
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask import render_template, request, session, redirect, url_for
+import flask
+from flask_login import login_user, current_user
 from habit_server.__init__ import app, db, login_manager
 from habit_server.db_models import User, UserActivity, UserHabit
 from habit_server.db_manager import DBManager
 from habit_server.utils import AlchemyEncoder
-from flask_login import login_user, logout_user, login_required, current_user
-import flask_login
 
 db.create_all()
 db_manager = DBManager(db.session)
@@ -21,13 +20,13 @@ def load_user(username):
 @app.route('/api/habits', methods=['GET'])
 def get_habits():
     """Get habits for a user.""" 
-    # user = User(username=session['username'], hashed_password = "")
-    result = db_manager.get_habits(flask_login.current_user)
+    result = db_manager.get_habits(current_user)
     if not result.is_ok():
         return "cannot get habits", 400
 
-    habits = result.unwrap()
+    # package up habit names and streaks for return
     resp_data = {'habits':[], 'streaks':[]}
+    habits = result.unwrap()
     for habit in habits:
         resp_data['habits'].append(habit.habitname)
         resp_data['streaks'].append(db_manager.get_activity_streak(habit).unwrap())
@@ -36,13 +35,11 @@ def get_habits():
 
 @app.route('/api/habits', methods=['POST'])
 def add_habit():
-    """Add a habit.
-
-    :param habitname str: habit to add
-    """ 
-    new_habit = request.form['habitname']
-    username = flask_login.current_user.username
-    userhabit = UserHabit(username = username, habitname=new_habit)
+    """Add a habit.""" 
+    userhabit = UserHabit(
+        username=current_user.username,
+        habitname=request.form['habitname']
+    )
     result = db_manager.add_habit(userhabit)
     if result.is_ok():
         return "add habit successful", 201
@@ -53,10 +50,10 @@ def add_habit():
 def delete_habit(habitname):
     """Delete a habit.
 
-    :param habitname str: habit to delete
+    :param habitname str: name of habit to delete
     """ 
     userhabit = UserHabit(
-        username=flask_login.current_user.username,
+        username=current_user.username,
         habitname=habitname
     )
     result = db_manager.delete_habit(userhabit)
@@ -72,12 +69,12 @@ def get_activites():
     :param habitname str: habit for the activity 
     """ 
     data = request.json
-    habitname = data['habitname']
-    trailing_days = 100
-    if data.get('trailing_days'):
-        trailing_days = data['trailing_days']
-    userhabit = UserHabit(username = session['username'], habitname = habitname)
-    result = db_manager.get_activities(userhabit, trailing_days)
+    trailing_days = data.get('trailing_days') or 100
+    userhabit = UserHabit(
+        username=current_user.username,
+        habitname=data.get('habitname')
+    )
+    result = db_manager.get_activities(userhabit, trailing_days=trailing_days)
     if result.is_ok():
         return json.dumps(result.unwrap(), cls=AlchemyEncoder), 200
     else:
@@ -85,18 +82,14 @@ def get_activites():
 
 @app.route('/api/habits/logs', methods=['POST'])
 def add_activites():
-    """Add activities for a habit.
-
-    :param habitname str: habit for the activity 
-    :param habitname str: timestamp for the activity 
-    """ 
+    """Add activities for a habit.""" 
     timestamp = date.fromisoformat(
         request.form['day_to_log']
     )
     activity = UserActivity(
-        username = flask_login.current_user.username,
-        habitname = request.form['habitname'],
-        timestamp = timestamp
+        username=current_user.username,
+        habitname=request.form['habitname'],
+        timestamp=timestamp
     )
     result = db_manager.add_activity(activity)
     if result.is_ok():
@@ -106,14 +99,10 @@ def add_activites():
 
 @app.route('/api/login', methods = ['POST'])
 def login():
-    """Login a user.
-
-    :param username str: username for the user 
-    :param password str: password for the user 
-    """ 
+    """Login a user.""" 
     data = request.form
-    username = data.get('username', None)
-    password = data.get('password', None)
+    username = data.get('username')
+    password = data.get('password')
     user = db_manager._session.query(User).filter_by(username=username).first()
     if not user or not user.check_password(password):
         return "login failed", 404
@@ -123,15 +112,11 @@ def login():
 
 @app.route('/api/users', methods = ['POST'])
 def register():
-    """Register a user.
-
-    :param username str: username for the user 
-    :param password str: password for the user 
-    """ 
+    """Register a user.""" 
     data = request.form
-    username = data.get('username', None)
-    password = data.get('password', None)
-    user = User(username = username, hashed_password = password)
+    username = data.get('username')
+    password = data.get('password')
+    user = User(username=username, hashed_password=password)
     user.set_password(password)
     result = db_manager.add_user(user)
     if result.is_ok():
