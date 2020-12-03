@@ -30,7 +30,7 @@ def load_user(username):
 
 @app.route('/')
 def home():
-    """Home page redirects to login if user not logged in otherwise to habits page"""
+    """Home page redirects to login if user not logged in otherwise to habits page."""
     if session.get('username'):
         return redirect("/habits", code=302)
     else:
