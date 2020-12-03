@@ -1,19 +1,8 @@
-from ..src.db_manager import DBManager
-from ..src.db_models import User, UserActivity, UserHabit
-from DBManagerTestFixture import DBManagerTestFixture
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from src.db_manager import DBManager
+from src.db_models import User, UserActivity, UserHabit
+from test.DBManagerTestFixture import DBManagerTestFixture
 import datetime
-import os
-import uuid
-
-app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
-app.config['SECRET_KEY'] = uuid.uuid4().hex
-db = SQLAlchemy(app)
-
+from app import app, db
 
 def test_add_user():
     """Test the add_user method of the db manager."""

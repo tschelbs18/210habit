@@ -1,17 +1,6 @@
 """DBManagerTestFixture for the habit server."""
 from src.db_manager import DBManager
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
-import uuid
-import os
-
-app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
-app.config['SECRET_KEY'] = uuid.uuid4().hex
-db = SQLAlchemy(app)
-
+from app import app, db
 
 class DBManagerTestFixture():
     """Database manager test fixture."""

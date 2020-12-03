@@ -2,17 +2,10 @@ import os
 import uuid
 import pytest
 from flask import Flask, session, json
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from ..src.db_models import User, UserActivity, UserHabit
-from DBManagerTestFixture import DBManagerTestFixture
-
-app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
-app.config['SECRET_KEY'] = uuid.uuid4().hex
-db = SQLAlchemy(app)
+from src.db_models import User, UserActivity, UserHabit
+from test.DBManagerTestFixture import DBManagerTestFixture
+from app import app, db
 
 def test_user():
     with DBManagerTestFixture() as db_man:

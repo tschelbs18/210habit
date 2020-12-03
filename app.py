@@ -16,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
 app.config['SECRET_KEY'] = uuid.uuid4().hex
 db.init_app(app)
+app.app_context().push()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -123,7 +124,7 @@ def login():
     if not user or not user.check_password(password):
         return "login failed", 404
     session['username'] = username
-    return render_template('src/templates/login.html', name=user.username)
+    return render_template('login.html', name=user.username)
 
 @app.route('/users', methods = ['POST'])
 def register():
