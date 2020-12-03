@@ -1,6 +1,15 @@
 """DBManagerTestFixture for the habit server."""
-from habit_server.__init__ import app, db
-from habit_server.db_manager import DBManager
+from src.db_manager import DBManager
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+import uuid
+
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
+app.config['SECRET_KEY'] = uuid.uuid4().hex
+db = SQLAlchemy(app)
 
 
 class DBManagerTestFixture():

@@ -1,9 +1,17 @@
-from habit_server.db_manager import DBManager
-from habit_server.db_models import User, UserActivity, UserHabit
+from src.db_manager import DBManager
+from src.db_models import User, UserActivity, UserHabit
 from DBManagerTestFixture import DBManagerTestFixture
 from flask import Flask
 from habit_server.app import app, db
+from flask_sqlalchemy import SQLAlchemy
 import datetime
+
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
+app.config['SECRET_KEY'] = uuid.uuid4().hex
+db = SQLAlchemy(app)
 
 
 def test_add_user():
