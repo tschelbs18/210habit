@@ -4,7 +4,7 @@ import pytest
 from flask import Flask, session, json
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from .src.db_models import User, UserActivity, UserHabit
+from ..src.db_models import User, UserActivity, UserHabit
 from DBManagerTestFixture import DBManagerTestFixture
 
 app = Flask(__name__)

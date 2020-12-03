@@ -1,5 +1,5 @@
-from .src.db_manager import DBManager
-from .src.db_models import User, UserActivity, UserHabit
+from ..src.db_manager import DBManager
+from ..src.db_models import User, UserActivity, UserHabit
 from DBManagerTestFixture import DBManagerTestFixture
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
