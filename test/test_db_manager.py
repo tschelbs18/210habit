@@ -1,8 +1,7 @@
-from src.db_manager import DBManager
-from src.db_models import User, UserActivity, UserHabit
+from .src.db_manager import DBManager
+from .src.db_models import User, UserActivity, UserHabit
 from DBManagerTestFixture import DBManagerTestFixture
 from flask import Flask
-from habit_server.app import app, db
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 import os
