@@ -28,7 +28,7 @@ def test_user():
                 data={'username': 'jane@gmail.com', 'password': 'pwd'},
                 content_type='application/x-www-form-urlencoded'
             )
-            assert response3.status_code == 200
+            assert response3.status_code == 302
 
             # login with wrong pwd
             response4 = c.post(
@@ -56,7 +56,7 @@ def test_habit():
                 data={'username': 'jane@gmail.com', 'password': 'pwd'},
                 content_type='application/x-www-form-urlencoded'
             )
-            assert response_login.status_code == 200
+            assert response_login.status_code == 302
 
             # add a  habit
             response1 = c.post(
