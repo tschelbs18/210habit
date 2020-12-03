@@ -1,8 +1,8 @@
 """Database manager for the habit server."""
 import datetime
 from result.result import Result
-from habit_server.db_models import User, UserActivity, UserHabit
-from habit_server.utils import is_valid_email_addr, get_activity_streak
+from src.db_models import User, UserActivity, UserHabit
+from src.utils import is_valid_email_addr, get_activity_streak
 
 
 class DBManager():

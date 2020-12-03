@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from habit_server.db_models import UserActivity
-from habit_server.utils import (
+from src.db_models import UserActivity
+from src.utils import (
     is_valid_email_addr,
     get_activity_streak
 )

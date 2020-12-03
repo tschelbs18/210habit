@@ -14,13 +14,10 @@ Habit and Activity Tracker Web App for CSE210
 3. Install the required modules into your virtual environment
 `pip install -r requirements.txt`
 
-4. Setup python path 
-`source setup_pythonpath.sh`
-
-5. Test the application
+4. Test the application
 [todo] `python test/*`
 
-6. Run the server
+5. Run the server
 `python application.py`
 
 6. Verify the server is working

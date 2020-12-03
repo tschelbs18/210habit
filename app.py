@@ -1,16 +1,30 @@
 """Habit Tracker Web Server entry point."""
 import json
 from datetime import date
-from flask import render_template, request, session, redirect, url_for
-import flask
-from flask_login import login_user, current_user
-from habit_server.__init__ import app, db, login_manager
-from habit_server.db_models import User, UserActivity, UserHabit
-from habit_server.db_manager import DBManager
-from habit_server.utils import AlchemyEncoder
+import os
+import uuid
+from flask import render_template, request, session, redirect, url_for, Flask
+from flask_login import login_user, current_user, LoginManager
+from src.db_models import User, UserActivity, UserHabit, db
+from src.db_manager import DBManager
+from src.utils import AlchemyEncoder
+
+# Flask App init
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+    os.path.join(basedir, 'db.sqlite')
+app.config['SECRET_KEY'] = uuid.uuid4().hex
+db.init_app(app)
+app.app_context().push()
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 db.create_all()
 db_manager = DBManager(db.session)
+
 
 @login_manager.user_loader
 def load_user(username):
@@ -32,6 +46,7 @@ def get_habits():
         resp_data['streaks'].append(db_manager.get_activity_streak(habit).unwrap())
 
     return json.dumps(resp_data), 200
+
 
 @app.route('/api/habits', methods=['POST'])
 def add_habit():
@@ -62,12 +77,13 @@ def delete_habit(habitname):
     else:
         return "cannot delete habit ", 404
 
+
 @app.route('/api/habits/logs', methods=['GET'])
 def get_activites():
     """Get activities for a user.
 
-    :param habitname str: habit for the activity 
-    """ 
+    :param habitname str: habit for the activity
+    """
     data = request.json
     trailing_days = data.get('trailing_days') or 100
     userhabit = UserHabit(
@@ -79,6 +95,7 @@ def get_activites():
         return json.dumps(result.unwrap(), cls=AlchemyEncoder), 200
     else:
         return "cannot get habit logs", 404
+
 
 @app.route('/api/habits/logs', methods=['POST'])
 def add_activites():
@@ -108,7 +125,8 @@ def login():
         return "login failed", 404
     session['username'] = username
     login_user(user)
-    return redirect(url_for('render_habits'))
+
+    return redirect(url_for('render_habits')), 200
 
 @app.route('/api/users', methods = ['POST'])
 def register():
@@ -127,17 +145,19 @@ def register():
 @app.route('/', methods=['GET'])
 @app.route('/login', methods=['GET'])
 def render_login():
-    """Render login page.""" 
+    """Render login page."""
     return render_template('login.html')
+
 
 @app.route('/habits', methods=['GET'])
 def render_habits():
-    """Render habits page.""" 
+    """Render habits page."""
     return render_template('habits.html')
+
 
 @app.route('/progress', methods=['GET'])
 def render_progress():
-    """Render progress page.""" 
+    """Render progress page."""
     return render_template('progress.html')
 
 

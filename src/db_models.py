@@ -2,7 +2,10 @@
 from werkzeug import useragents
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from habit_server.__init__ import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
 
 class User(db.Model, UserMixin):
     """Database ORM model representing a User."""

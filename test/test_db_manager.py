@@ -1,8 +1,5 @@
-from habit_server.db_manager import DBManager
-from habit_server.db_models import User, UserActivity, UserHabit
-from DBManagerTestFixture import DBManagerTestFixture
-from flask import Flask
-from habit_server.app import app, db
+from src.db_models import User, UserActivity, UserHabit
+from test.DBManagerTestFixture import DBManagerTestFixture
 import datetime
 
 

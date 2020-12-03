@@ -1,64 +1,63 @@
-import os
-import uuid
-import pytest
-from flask import Flask, session, json
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
-from habit_server.app import app, db
-from habit_server.db_models import User, UserActivity, UserHabit
-from DBManagerTestFixture import DBManagerTestFixture
+from flask import json
+from test.DBManagerTestFixture import DBManagerTestFixture
+from app import app
+
 
 def test_user():
-    with DBManagerTestFixture() as db_man:
+    with DBManagerTestFixture():
         with app.test_client() as c:
             # register a new user
             response1 = c.post(
-                '/users',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
-                content_type='application/json',
-                )
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
+            )
             assert response1.status_code == 200
+
             # add duplicate user
             response2 = c.post(
-                '/users',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
-                content_type='application/json',
-                )
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
+            )
             assert response2.status_code == 404
 
-            #login successful
+            # login successful
             response3 = c.post(
-                '/login',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
-                content_type='application/json',
-                )
+                '/api/login',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
+            )
             assert response3.status_code == 200
 
             # login with wrong pwd
             response4 = c.post(
-                '/login',
-                data=json.dumps({'username': 'jane@gmail.com','password':'wrongpwd'}),
+                '/api/login',
+                data=json.dumps(
+                    {'username': 'jane@gmail.com', 'password': 'wrongpwd'}),
                 content_type='application/json',
-                )
+            )
             assert response4.status_code == 404
 
 
 def test_habit():
-    with DBManagerTestFixture() as db_man:
+    with DBManagerTestFixture():
         with app.test_client() as c:
             # register a new user
             response_user = c.post(
                 '/users',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
+                data=json.dumps(
+                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
                 content_type='application/json',
-                )
+            )
             assert response_user.status_code == 200
             # login
             response_login = c.post(
                 '/login',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
+                data=json.dumps(
+                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
                 content_type='application/json',
-                )
+            )
             assert response_login.status_code == 200
             # add a  habit
             response1 = c.post(
@@ -81,22 +80,25 @@ def test_habit():
             )
             assert response3.status_code == 200
 
+
 def test_activity():
-    with DBManagerTestFixture() as db_man:
+    with DBManagerTestFixture():
         with app.test_client() as c:
             # register
             response_user = c.post(
                 '/users',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
+                data=json.dumps(
+                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
                 content_type='application/json',
-                )
+            )
             assert response_user.status_code == 200
             # login
             response_login = c.post(
                 '/login',
-                data=json.dumps({'username': 'jane@gmail.com','password':'pwd'}),
+                data=json.dumps(
+                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
                 content_type='application/json',
-                )
+            )
             assert response_login.status_code == 200
 
             # add a habit
@@ -109,14 +111,15 @@ def test_activity():
             # add a activity
             response2 = c.post(
                 '/api/habits/logs',
-                data=json.dumps({'habitname': 'reading', 'timestamp': '2020-11-30'}),
+                data=json.dumps(
+                    {'habitname': 'reading', 'timestamp': '2020-11-30'}),
                 content_type='application/json',
             )
             assert response2.status_code == 200
             # get activity given a date
             response3 = c.get(
                 'api/habits/logs',
-                data=json.dumps({'habitname': 'reading', 'trailing_days':5}),
+                data=json.dumps({'habitname': 'reading', 'trailing_days': 5}),
                 content_type='application/json',
             )
             assert response3.status_code == 200
@@ -126,4 +129,4 @@ def test_activity():
                 data=json.dumps({'habitname': 'reading'}),
                 content_type='application/json',
             )
-            assert response3.status_code == 200
+            assert response4.status_code == 200
