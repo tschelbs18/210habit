@@ -3,6 +3,7 @@ from src.db_manager import DBManager
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import uuid
+import os
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))

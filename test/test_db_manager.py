@@ -5,6 +5,8 @@ from flask import Flask
 from habit_server.app import app, db
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+import os
+import uuid
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
