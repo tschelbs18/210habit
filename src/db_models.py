@@ -30,6 +30,13 @@ class User(db.Model, UserMixin):
         """
         return check_password_hash(self.hashed_password, password)
 
+    def get_id(self):
+        """Get unique id of user (just the username).
+
+        :return str: user id
+        """
+        return self.username
+
 
 class UserHabit(db.Model):
     """Database ORM model representing a single user habit."""

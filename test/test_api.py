@@ -8,33 +8,31 @@ def test_user():
         with app.test_client() as c:
             # register a new user
             response1 = c.post(
-                '/users',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response1.status_code == 200
+
             # add duplicate user
             response2 = c.post(
-                '/users',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response2.status_code == 404
 
             # login successful
             response3 = c.post(
-                '/login',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/login',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
-            assert response3.status_code == 200
+            assert response3.status_code == 302
 
             # login with wrong pwd
             response4 = c.post(
-                '/login',
+                '/api/login',
                 data=json.dumps(
                     {'username': 'jane@gmail.com', 'password': 'wrongpwd'}),
                 content_type='application/json',
@@ -47,38 +45,37 @@ def test_habit():
         with app.test_client() as c:
             # register a new user
             response_user = c.post(
-                '/users',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response_user.status_code == 200
             # login
             response_login = c.post(
-                '/login',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/login',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
-            assert response_login.status_code == 200
+            assert response_login.status_code == 302
+
             # add a  habit
             response1 = c.post(
                 '/api/habits',
-                data=json.dumps({'habitname': 'reading'}),
-                content_type='application/json',
+                data={'habitname': 'reading'},
+                content_type='application/x-www-form-urlencoded'
             )
-            assert response1.status_code == 200
+            assert response1.status_code == 201
+
             # get all habits
             response2 = c.get(
                 '/api/habits',
-                content_type='application/json',
+                content_type='application/x-www-form-urlencoded'
             )
             assert response2.status_code == 200
+
             # delete a habit
             response3 = c.delete(
-                '/api/habits',
-                data=json.dumps({'habitname': 'reading'}),
-                content_type='application/json',
+                '/api/habits/reading',
             )
             assert response3.status_code == 200
 
@@ -88,47 +85,48 @@ def test_activity():
         with app.test_client() as c:
             # register
             response_user = c.post(
-                '/users',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response_user.status_code == 200
+
             # login
             response_login = c.post(
-                '/login',
-                data=json.dumps(
-                    {'username': 'jane@gmail.com', 'password': 'pwd'}),
-                content_type='application/json',
+                '/api/login',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
             )
-            assert response_login.status_code == 200
+            assert response_login.status_code == 302  # redirect to habits
 
-            # add a habit
+            # add a  habit
             response1 = c.post(
                 '/api/habits',
-                data=json.dumps({'habitname': 'reading'}),
-                content_type='application/json',
+                data={'habitname': 'reading'},
+                content_type='application/x-www-form-urlencoded'
             )
-            assert response1.status_code == 200
+            assert response1.status_code == 201
+
             # add a activity
             response2 = c.post(
                 '/api/habits/logs',
-                data=json.dumps(
-                    {'habitname': 'reading', 'timestamp': '2020-11-30'}),
-                content_type='application/json',
+                data={'habitname': 'reading', 'day_to_log': '2020-11-30'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response2.status_code == 200
+
             # get activity given a date
             response3 = c.get(
                 'api/habits/logs',
-                data=json.dumps({'habitname': 'reading', 'trailing_days': 5}),
-                content_type='application/json',
+                data={'habitname': 'reading', 'trailing_days': 5},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response3.status_code == 200
+
             # get all activity
             response4 = c.get(
                 'api/habits/logs',
-                data=json.dumps({'habitname': 'reading'}),
-                content_type='application/json',
+                data={'habitname': 'reading'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response4.status_code == 200

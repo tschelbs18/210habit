@@ -32,13 +32,11 @@ class HabitManager {
 	 * @param {ZingGrid} zg - The zing grid object
 	 */
 	constructor(session_id, user, zg) {
-		//this.habits = [];
 		// temporary while testing
-		this.habits = ["Running", "Working Out", "Eating Vegetables"];
-		this.streaks = {"Running":13, "Working Out":7, "Eating Vegetables":2}
 		this.session_id = session_id;
 		this.user = user;
 		this.zg = zg;
+		this.habits = [];
 	}
 
 	/**
@@ -48,7 +46,7 @@ class HabitManager {
 	requestHabits()
 	{
 		var mgr = this;
-		fetch('http://127.0.0.1:8080/api/habits/', {credentials: 'include'})
+		fetch('http://127.0.0.1:5000/api/habits', {credentials: 'include'})
 		  .then(
 			function(response) {
 
@@ -92,13 +90,13 @@ class HabitManager {
 	{
 		console.log("attempting to add habit: " + habit);
 		var mgr = this;
-		fetch('http://127.0.0.1:8080/api/habits/', {
+		fetch('http://127.0.0.1:5000/api/habits', {
 			method: 'post',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'activity='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'habitname='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -108,13 +106,10 @@ class HabitManager {
 					return;
 				}
 
-				response.json().then(function(data) {
-					console.log('Request succeeded with JSON response', data);
-					var zg = document.querySelector('zing-grid');
-					zg.insertRow(        {
-						"habit": data['habit'],
-						"streak": 0
-					});
+				var zg = document.querySelector('zing-grid');
+				zg.insertRow({
+					"habit": habit,
+					"streak": 0
 				});
 		  })
 		  .catch(function (error) {
@@ -136,7 +131,7 @@ class HabitManager {
 	deleteHabit(habit)
 	{
 		var mgr = this;
-		fetch('http://127.0.0.1:8080/api/habits/'+habit, {
+		fetch('http://127.0.0.1:5000/api/habits/'+habit, {
 			method: 'delete',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -152,9 +147,7 @@ class HabitManager {
 				return;
 				}
 
-				response.json().then(function(data) {
-					console.log('Request succeeded with JSON response', data);
-				});
+				console.log('Successfully delete habit:', habit);
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);
@@ -167,12 +160,12 @@ class HabitManager {
 	 */
 	renderRows()
 	{
-		var mgr = this;
 		console.log("Updating rows with habits: "+this.habits);
+		var mgr = this;
 		var data = [];
 		for(var i = 0; i < this.habits.length; i++)
 		{
-			data.push({'habit':this.habits[i], 'streak':this.streaks[this.habits[i]]});
+			data.push({'habit':this.habits[i], 'streak':this.streaks[i]});
 		}
 		this.zg.setData(data);
 
@@ -196,13 +189,13 @@ class HabitManager {
 		let today = new Date()
 		var timestamp = today.toISOString().split('T')[0] // YYYY-MM-DD format
 		var mgr = this;
-		fetch('http://127.0.0.1:8080/api/habits/log', {
+		fetch('http://127.0.0.1:5000/api/habits/logs', {
 			method: 'post',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'day_to_log='+timestamp+'&habit_name='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'day_to_log='+timestamp+'&habitname='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -212,9 +205,7 @@ class HabitManager {
 				return;
 				}
 
-				response.json().then(function(data) {
-					console.log('Request succeeded with JSON response', data);
-				});
+				console.log('Successfull activity post:', habit, timestamp);
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);
