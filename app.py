@@ -3,10 +3,22 @@ import json
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, session, redirect
-from habit_server.__init__ import app, db, login_manager
-from habit_server.db_models import User, UserActivity, UserHabit
-from habit_server.db_manager import DBManager
-from habit_server.utils import AlchemyEncoder
+from src.db_models import User, UserActivity, UserHabit, db
+from src.db_manager import DBManager
+from src.utils import AlchemyEncoder
+from flask_login import LoginManager
+import os
+import uuid
+
+app = Flask(__name__, template_folder="src/templates/", static_folder="src/static")
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
+app.config['SECRET_KEY'] = uuid.uuid4().hex
+db.init_app(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 db_manager = DBManager(db.session)
 
@@ -111,7 +123,7 @@ def login():
     if not user or not user.check_password(password):
         return "login failed", 404
     session['username'] = username
-    return render_template('login.html', name=user.username)
+    return render_template('src/templates/login.html', name=user.username)
 
 @app.route('/users', methods = ['POST'])
 def register():

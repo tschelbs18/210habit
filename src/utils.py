@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 import re
 import json
-from habit_server.__init__ import db
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 
