@@ -7,6 +7,7 @@
   <title>Log Habits</title>
   <link rel="stylesheet" href="static/style.css">
   <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
+  <script src="static/js/habit_manager.js"></script>
 </head>
 
 <body>
@@ -15,8 +16,8 @@
       <nav id="main-menu">
         <!-- adapted from https://codepen.io/Cheesetoast/pen/qACsJ -->
         <ul class="nav-bar">
-          <li><a href="#">Habit Tracker</a></li>
-          <li><a class="nav-button" href="#">Log</a></li>
+          <li>Habit Tracker</li>
+          <li class="active"><a class="nav-button" href="#">Log</a></li>
           <li><a class="nav-button" href="#">Progress</a></li>
         </ul>
       </nav>
@@ -43,16 +44,20 @@
           </zg-column>
         </zg-colgroup>
       </zing-grid>
+	<div id="add-habit">
+		<input id="new-habit" type="text" placeholder="Enter new habit..."></input><button id="add">Create New Habit</button>
+	</div>
     </div>
     <div id="loader-page">
     </div>
     <div id="loader-spinner"></div>
   </div>
 
-  <footer>
-    <img src="static/img/AppLogo210.png" alt="Apperature Labs logo" height="30">
-  </footer>
 </div>
+
+  <footer>
+    <img src="static/img/AppLogo210white.png" alt="Apperature Labs logo" height="30">
+  </footer>
 
 </body>
 

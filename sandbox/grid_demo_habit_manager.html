@@ -54,6 +54,31 @@
 	  0% { transform: rotate(0deg); }
 	  100% { transform: rotate(360deg); }
 	}
+	
+	#new-habit {
+		margin-right:10px;
+		margin-top:10px;
+		font-family: Roboto, verdana, sans-serif;
+		font-size:14px;
+		font-weight: 400;
+	}
+	
+	#add {
+		padding: 6px;
+		box-shadow: 0px 0px 4px grey;
+		background-color: white;
+		border: none;
+		font-family: Roboto, verdana, sans-serif;
+		font-size:14px;
+		font-weight: 400;
+	}
+	
+	#add:hover {
+		background-color: #0099FF;
+		color: white;
+		cursor:pointer;
+	}
+	
 	</style>
   </head>
   <body>
@@ -80,6 +105,9 @@
 			</zg-column>
 		  </zg-colgroup>
 		</zing-grid>
+		<div id="add-habit">
+			<input id="new-habit" type="text" placeholder="Enter new habit..."></input><button id="add">Create New Habit</button>
+		</div>
 	</div>
 	<div id="loader-page">
 	</div>
@@ -89,6 +117,26 @@
 	<script>
 window.render_streak = (streak, DOMCell, $cell) => {
 	return "&#x1F525; " + String(streak)
+}
+
+function log_callback(handler, manager, e)
+{
+	var button = e.target;
+
+	while(!button.className.includes("log-button"))
+	{
+		button = button.parentElement; // checkmark or text element in button target
+	}
+
+	button.disabled = true;
+	button.removeEventListener(e.type, handler);
+	var habit = button.parentElement.parentElement.nextElementSibling.textContent;
+	var streak = button.parentElement.parentElement.nextElementSibling.nextElementSibling;
+	var new_streak = parseInt(streak.getAttribute('value')) + 1;
+	streak.setAttribute('value',new_streak.toString());
+	streak.innerHTML = "🔥 " + new_streak;
+	
+	manager.logHabit(habit);
 }
 
 /** This class manages retrieving habits from the server and rendering them in a Zing Grid on the page. */
@@ -134,6 +182,7 @@ class HabitManager {
 			  response.json().then(function(data) {
 				console.log(data);
 				mgr.habits = data.habits;
+				mgr.streaks = data.streaks; //tbd determine format of streaks in endpoint
 				mgr.renderRows(); // due to async nature, we call here
 			  });
 			}
@@ -152,13 +201,13 @@ class HabitManager {
 	}
 
 	/**
-	 * Adds or deletes the user's habit from the server.
-	 * @updateHabit
-	 * @param {string} habit - the name of the habit to delete
-	 * @param {string} action - either 'add' or 'delete' the habit
+	 * Adds the user's habit to the server.
+	 * @addHabit
+	 * @param {string} habit - the name of the habit to add
 	 */
-	updateHabit(habit, action)
+	addHabit(habit)
 	{
+		console.log("attempting to add habit: " + habit);
 		var mgr = this;
 		fetch('http://127.0.0.1:8080/api/habits/', {
 			method: 'post',
@@ -166,7 +215,51 @@ class HabitManager {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'habit='+habit+'&action='+action+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'activity='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+		  })
+		  .then(
+			function(response) {
+				if (response.status !== 201) {
+				console.log('Looks like there was a problem. Status Code: ' +
+				  response.status);
+					return;
+				}
+
+				response.json().then(function(data) {
+					console.log('Request succeeded with JSON response', data);
+					var zg = document.querySelector('zing-grid');
+					zg.insertRow(        {
+						"habit": data['habit'],
+						"streak": 0
+					});
+				});
+		  })
+		  .catch(function (error) {
+			console.log('Request failed', error);
+			// test only, add anyways:
+			var zg = document.querySelector('zing-grid');
+			zg.insertRow(        {
+				"habit": habit,
+				"streak": 0
+			});
+		  });
+	}
+
+	/**
+	 * Deletes the user's habit from the server.
+	 * @deleteHabit
+	 * @param {string} habit - the name of the habit to delete
+	 */
+	deleteHabit(habit)
+	{
+		var mgr = this;
+		fetch('http://127.0.0.1:8080/api/habits/'+habit, {
+			method: 'delete',
+			headers: {
+			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+			},
+			credentials: 'include',
+			body: 'user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -205,26 +298,7 @@ class HabitManager {
 		for (i=0; i < log_buttons.length; i++)
 		{
 			log_buttons[i].addEventListener("click", function handler(e) {
-				console.log(e.target);
-				var button = e.target;
-		
-				while(!button.className.includes("log-button"))
-				{
-					button = button.parentElement; // checkmark or text element in button target
-				}
-
-				console.log('disabled button: ' + button.className);
-
-				button.disabled = true;
-				button.removeEventListener(e.type, handler);
-				var habit = button.parentElement.parentElement.nextElementSibling.textContent;
-				console.log("Log clicked for habit: " + habit);
-				mgr.logHabit(habit); // we assume this worked
-
-				// increment the streak count
-				mgr.streaks[habit] += 1;
-				var streak_elem = button.parentElement.parentElement.nextElementSibling.nextElementSibling.firstElementChild;
-				streak_elem.innerHTML = "&#x1F525; " + String(mgr.streaks[habit]);
+				log_callback(handler, mgr, e);
 			});
 		}
 	}
@@ -245,7 +319,7 @@ class HabitManager {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'habit='+habit+'&date='+timestamp+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'day_to_log='+timestamp+'&habit_name='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
 		  })
 		  .then(
 			function(response) {
@@ -274,11 +348,40 @@ window.addEventListener('load', (event) => {
 		manager.requestHabits();
 	});
 
-	zgRef.addEventListener('data:record:delete', (e) => {
-		console.log('Habit deleted: ' + e.detail.ZGData.data.habit);
-		manager.updateHabit(e.detail.ZGData.data.habit, 'delete');
+	// Customize delete record dialog
+	zgRef.customizeDialog('record-delete', {
+	  cancel: "Cancel",
+	  confirm: "Delete Habit",
+	  label: "Confirm permanently deleting habit"
 	});
 
+	zgRef.addEventListener('data:record:delete', (e) => {
+		console.log('Habit deleted: ' + e.detail.ZGData.data.habit);
+		manager.deleteHabit(e.detail.ZGData.data.habit);
+	});
+	
+	zgRef.addEventListener('data:record:insert', async (e) => {
+		console.log('Habit created: ' + e.detail.ZGData.data.habit);
+		document.getElementById('loader-page').style.display='none';
+		document.getElementById('loader-spinner').style.display='none';
+		await new Promise(resolve => setTimeout(resolve, 500)); // wait for new log row to be added
+		var log_buttons = document.getElementsByClassName('log-button');
+		log_buttons[log_buttons.length - 1].addEventListener("click", function handler(e) {
+				log_callback(handler, manager, e);
+		});
+	});
+	
+	// bind callback for create new habit button
+	var btn = document.getElementById('add');
+	btn.addEventListener("click", function add(e) {
+		var input = document.getElementById('new-habit');
+		if(input.value != '')
+		{
+			document.getElementById('loader-page').style.display='block';
+			document.getElementById('loader-spinner').style.display='block';
+			manager.addHabit(input.value);
+		}
+	});
 });
 	</script>
 </html>
