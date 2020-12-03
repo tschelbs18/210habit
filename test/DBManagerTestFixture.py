@@ -2,6 +2,7 @@
 from src.db_manager import DBManager
 from app import app, db
 
+
 class DBManagerTestFixture():
     """Database manager test fixture."""
 

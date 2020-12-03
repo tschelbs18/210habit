@@ -4,6 +4,7 @@ from test.DBManagerTestFixture import DBManagerTestFixture
 import datetime
 from app import app, db
 
+
 def test_add_user():
     """Test the add_user method of the db manager."""
     with DBManagerTestFixture() as db_man:
