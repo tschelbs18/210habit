@@ -28,29 +28,31 @@ db_manager = DBManager(db.session)
 
 @login_manager.user_loader
 def load_user(username):
-    """Retrive current user."""    
+    """Retrive current user."""
     return User.query.get(username)
+
 
 @app.route('/api/habits', methods=['GET'])
 def get_habits():
-    """Get habits for a user.""" 
+    """Get habits for a user."""
     result = db_manager.get_habits(current_user)
     if not result.is_ok():
         return "cannot get habits", 400
 
     # package up habit names and streaks for return
-    resp_data = {'habits':[], 'streaks':[]}
+    resp_data = {'habits': [], 'streaks': []}
     habits = result.unwrap()
     for habit in habits:
         resp_data['habits'].append(habit.habitname)
-        resp_data['streaks'].append(db_manager.get_activity_streak(habit).unwrap())
+        resp_data['streaks'].append(
+            db_manager.get_activity_streak(habit).unwrap())
 
     return json.dumps(resp_data), 200
 
 
 @app.route('/api/habits', methods=['POST'])
 def add_habit():
-    """Add a habit.""" 
+    """Add a habit."""
     userhabit = UserHabit(
         username=current_user.username,
         habitname=request.form['habitname']
@@ -61,12 +63,13 @@ def add_habit():
     else:
         return "cannot add habit ", 404
 
+
 @app.route('/api/habits/<habitname>', methods=['DELETE'])
 def delete_habit(habitname):
     """Delete a habit.
 
     :param habitname str: name of habit to delete
-    """ 
+    """
     userhabit = UserHabit(
         username=current_user.username,
         habitname=habitname
@@ -80,17 +83,14 @@ def delete_habit(habitname):
 
 @app.route('/api/habits/logs', methods=['GET'])
 def get_activites():
-    """Get activities for a user.
-
-    :param habitname str: habit for the activity
-    """
-    data = request.json
-    trailing_days = data.get('trailing_days') or 100
+    """Get activities for a user."""
     userhabit = UserHabit(
         username=current_user.username,
-        habitname=data.get('habitname')
+        habitname=request.form.get('habitname')
     )
-    result = db_manager.get_activities(userhabit, trailing_days=trailing_days)
+    trailing_days = request.form.get('trailing_days') or 100
+    result = db_manager.get_activities(
+        userhabit, trailing_days=int(trailing_days))
     if result.is_ok():
         return json.dumps(result.unwrap(), cls=AlchemyEncoder), 200
     else:
@@ -99,7 +99,7 @@ def get_activites():
 
 @app.route('/api/habits/logs', methods=['POST'])
 def add_activites():
-    """Add activities for a habit.""" 
+    """Add activities for a habit."""
     timestamp = date.fromisoformat(
         request.form['day_to_log']
     )
@@ -114,9 +114,10 @@ def add_activites():
     else:
         return "cannot add activity", 404
 
-@app.route('/api/login', methods = ['POST'])
+
+@app.route('/api/login', methods=['POST'])
 def login():
-    """Login a user.""" 
+    """Login a user."""
     data = request.form
     username = data.get('username')
     password = data.get('password')
@@ -126,11 +127,12 @@ def login():
     session['username'] = username
     login_user(user)
 
-    return redirect(url_for('render_habits')), 200
+    return redirect('/habits')
 
-@app.route('/api/users', methods = ['POST'])
+
+@app.route('/api/users', methods=['POST'])
 def register():
-    """Register a user.""" 
+    """Register a user."""
     data = request.form
     username = data.get('username')
     password = data.get('password')
@@ -141,6 +143,7 @@ def register():
         return render_template('login.html', name=user.username)
     else:
         return "register failed", 404
+
 
 @app.route('/', methods=['GET'])
 @app.route('/login', methods=['GET'])

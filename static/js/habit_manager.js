@@ -147,9 +147,7 @@ class HabitManager {
 				return;
 				}
 
-				response.json().then(function(data) {
-					console.log('Request succeeded with JSON response', data);
-				});
+				console.log('Successfully delete habit:', habit);
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);

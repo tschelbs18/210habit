@@ -1,5 +1,4 @@
 """Databse ORM models."""
-from werkzeug import useragents
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
@@ -32,8 +31,11 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.hashed_password, password)
 
     def get_id(self):
-        return self.username
+        """Get unique id of user (just the username).
 
+        :return str: user id
+        """
+        return self.username
 
 
 class UserHabit(db.Model):
