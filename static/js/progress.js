@@ -33,12 +33,26 @@ function getRelevantDates(today) {
 /**
  * Perform an API call to get the habit activity for the current user.
 */
-function requestHabits() {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'http://127.0.0.1:5000/habits', false);
-  data = xhr.send()
-  console.log(data)
-  return data
+function requestHabits()
+{
+  fetch('http://127.0.0.1:5000/api/habits/all_logs', {credentials: 'include'})
+    .then(
+    function(response) {
+
+      if (response.status !== 200) {
+      console.log('Looks like there was a problem. Status Code: ' +
+        response.status);
+      return;
+      }
+
+      // Examine the text in the response
+      response.json().then(function(data) {
+      console.log(data);
+      });
+    }
+    );
+
+}
   /*
   Notes:
   Order doesn't matter for the dates, but value does for the opacity of the color.
@@ -131,7 +145,6 @@ function requestHabits() {
   // ];
   // var user4habits = [];
   // return user2habits;
-}
 
 /**
  * Takes the results of getRelevantDates and requestHabits to build a T3M chart for each of the habits logged for the current user.
@@ -140,6 +153,7 @@ function renderHabitCharts() {
   // Render the relevant charts for the user's habit activity over the most recent 3 months.
   // Get the habit information for the current user.
   var habitList = requestHabits();
+  console.log(habitList)
   // Get the needed date information to build the calendar.
   var dates = getRelevantDates(new Date());
   // Get root node within which we will insert new html elements.
@@ -156,7 +170,7 @@ function renderHabitCharts() {
   // Loop over the array of habits and add a header and chart.
   for (i = 0; i < habitList.length; i++) {
     var habitinfo = habitList[i];
-    var habitname = habitinfo['name']
+    var habitname = habitinfo['habitname']
     // Create a header element with the name of the habit
     var header = document.createElement("H2");
     var headerText = document.createTextNode(habitname);
