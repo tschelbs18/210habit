@@ -124,7 +124,7 @@ def login():
     user = db_manager._session.query(User).filter_by(username=username).first()
     if not user or not user.check_password(password):
         flash('Login failed')
-        return render_template('login.html')
+        return render_template('login.html'), 404
     session['username'] = username
     login_user(user)
 
@@ -144,7 +144,7 @@ def register():
         return render_template('login.html', name=user.username)
     else:
         flash('Registration failed')
-        return render_template('login.html')
+        return render_template('login.html'), 404
 
 
 @app.route('/', methods=['GET'])
