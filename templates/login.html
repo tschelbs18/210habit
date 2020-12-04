@@ -12,6 +12,15 @@
   <!-- adapted from https://codepen.io/ehermanson/pen/KwKWEv -->
   <div class='page-container'>
     <div class='content-wrapper'>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <p class="alert">
+              {{message}}
+            </p>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
       <div class="form">
 
         <ul class="tab-group">

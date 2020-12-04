@@ -20,6 +20,11 @@
 .active > a{
 	text-decoration: underline !important;
 }
+.alert {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+}
 footer {
   position: absolute;
   bottom: 0;
@@ -256,6 +261,6 @@ zg-button:hover {
 	color: white;
 	cursor:pointer;
 }
-	
+
 
 /***************************/

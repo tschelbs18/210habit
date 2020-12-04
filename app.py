@@ -3,7 +3,7 @@ import json
 from datetime import date
 import os
 import uuid
-from flask import render_template, request, session, redirect, Flask
+from flask import render_template, request, session, redirect, Flask, flash
 from flask_login import login_user, current_user, LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
@@ -123,7 +123,8 @@ def login():
     password = data.get('password')
     user = db_manager._session.query(User).filter_by(username=username).first()
     if not user or not user.check_password(password):
-        return "login failed", 404
+        flash('Login failed')
+        return render_template('login.html'), 404
     session['username'] = username
     login_user(user)
 
@@ -142,7 +143,8 @@ def register():
     if result.is_ok():
         return render_template('login.html', name=user.username)
     else:
-        return "register failed", 404
+        flash('Registration failed')
+        return render_template('login.html'), 404
 
 
 @app.route('/', methods=['GET'])
