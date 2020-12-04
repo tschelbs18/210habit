@@ -143,7 +143,8 @@ def register():
     if result.is_ok():
         return render_template('login.html', name=user.username)
     else:
-        return "register failed", 404
+        flash('Registration failed')
+        return render_template('login.html')
 
 
 @app.route('/', methods=['GET'])
