@@ -3,8 +3,9 @@ import json
 from datetime import date
 import os
 import uuid
-from flask import render_template, request, session, redirect, Flask, url_for
-from flask_login import login_user, logout_user, login_required, current_user, LoginManager
+from flask import render_template, request, redirect, Flask, url_for
+from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
 from src.utils import AlchemyEncoder
