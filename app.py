@@ -74,7 +74,7 @@ def delete_habit():
         username=current_user.username,
         habitname=request.form['habitname']
     )
-    result = db_manager.delete_habit(userhabit)
+    result = db_manager.delete_habit(request.form['habitname'])
     if result.is_ok():
         return "delete habit successful", 200
     else:
