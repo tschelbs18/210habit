@@ -84,7 +84,7 @@ def delete_habit(habitname):
 @app.route('/api/habits/all_logs', methods=['GET'])
 def get_all_activites():
     """Get all activities for a user."""
-    username=current_user.username
+    username = current_user.username
     result = db_manager.get_all_activities(username)
     if result.is_ok():
         return json.dumps(result.unwrap(), cls=AlchemyEncoder), 200
