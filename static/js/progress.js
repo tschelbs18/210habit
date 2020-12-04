@@ -136,10 +136,10 @@ async function requestHabits()
 /**
  * Takes the results of getRelevantDates and requestHabits to build a T3M chart for each of the habits logged for the current user.
 */
-function renderHabitCharts() {
+async function renderHabitCharts() {
   // Render the relevant charts for the user's habit activity over the most recent 3 months.
   // Get the habit information for the current user.
-  var habitList = requestHabits();
+  var habitList = await requestHabits();
   console.log(habitList)
   // Get the needed date information to build the calendar.
   var dates = getRelevantDates(new Date());
