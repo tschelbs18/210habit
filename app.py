@@ -3,36 +3,46 @@ import json
 from datetime import date
 import os
 import uuid
-from flask import render_template, request, session, redirect, Flask
-from flask_login import login_user, current_user, LoginManager
+from flask import render_template, request, session, redirect, Flask, url_for
+from flask_login import login_user, logout_user, login_required, current_user, LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
 from src.utils import AlchemyEncoder
+import sys
 
 # Flask App init
 app = Flask(__name__)
+app.config['SECRET_KEY'] = uuid.uuid4().hex
+app.app_context().push()
+
+# login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "/"
+login_manager.login_message = u"you must login to access this page"
+login_manager.login_message_category = "message"
+
+
+# db
+db.init_app(app)
+db.create_all()
+# TODO using a local db.session might be a better idea
+db_manager = DBManager(db.session)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'db.sqlite')
-app.config['SECRET_KEY'] = uuid.uuid4().hex
-db.init_app(app)
-app.app_context().push()
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-db.create_all()
-db_manager = DBManager(db.session)
 
 
 @login_manager.user_loader
 def load_user(username):
     """Retrive current user."""
-    return User.query.get(username)
+    user = User.query.filter_by(username=username).first()
+    return user
 
 
 @app.route('/api/habits', methods=['GET'])
+@login_required
 def get_habits():
     """Get habits for a user."""
     result = db_manager.get_habits(current_user)
@@ -51,6 +61,7 @@ def get_habits():
 
 
 @app.route('/api/habits', methods=['POST'])
+@login_required
 def add_habit():
     """Add a habit."""
     userhabit = UserHabit(
@@ -65,6 +76,7 @@ def add_habit():
 
 
 @app.route('/api/habits/<habitname>', methods=['DELETE'])
+@login_required
 def delete_habit(habitname):
     """Delete a habit.
 
@@ -82,6 +94,7 @@ def delete_habit(habitname):
 
 
 @app.route('/api/habits/logs', methods=['GET'])
+@login_required
 def get_activites():
     """Get activities for a user."""
     userhabit = UserHabit(
@@ -98,6 +111,7 @@ def get_activites():
 
 
 @app.route('/api/habits/logs', methods=['POST'])
+@login_required
 def add_activites():
     """Add activities for a habit."""
     timestamp = date.fromisoformat(
@@ -124,7 +138,6 @@ def login():
     user = db_manager._session.query(User).filter_by(username=username).first()
     if not user or not user.check_password(password):
         return "login failed", 404
-    session['username'] = username
     login_user(user)
 
     return redirect('/habits')
@@ -134,6 +147,7 @@ def login():
 def register():
     """Register a user."""
     data = request.form
+    # TODO we might need also to check if data has username or password
     username = data.get('username')
     password = data.get('password')
     user = User(username=username, hashed_password=password)
@@ -152,6 +166,42 @@ def render_login():
     return render_template('login.html')
 
 
+@app.route('/logout', methods=['GET'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('/'))
+
+
+@app.route('/test/register/<username>/<password>')
+def test_register(username, password):
+    """Route for test register"""
+    user = User(username=username, hashed_password=int(password))
+    scoped_session = db.create_scoped_session()
+    res = db_manager.DBManager(scoped_session).add_user(user)
+
+    if res.is_ok():
+        return "you are registered {}".format(user.username), 200
+    return "{}".format(res), 400
+
+
+@app.route('/test/login/<username>/<password>')
+def test_login(username, password):
+    """Route for test login"""
+    user = User.query.filter_by(username=username).first()
+
+    # user exist and password matched
+    if not user or not user.hashed_password == password:
+        return "User does not exist or password not matched", 400
+    login_user(user)
+    return "Welcom back {}".format(user.username), 200
+
+
+@app.route('/test/current_user')
+def cur_user():
+    return "{}".format(current_user.username)
+
+
 @app.route('/habits', methods=['GET'])
 def render_habits():
     """Render habits page."""
@@ -165,4 +215,4 @@ def render_progress():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run('0.0.0.0', debug=True)
