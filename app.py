@@ -8,7 +8,6 @@ from flask_login import login_user, current_user, LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
 from src.utils import AlchemyEncoder
-import sys
 
 # Flask App init
 app = Flask(__name__)
@@ -172,6 +171,7 @@ def render_login():
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout():
+    "Logout a user"
     logout_user()
     return redirect(url_for('/'))
 
@@ -202,6 +202,7 @@ def test_login(username, password):
 
 @app.route('/test/current_user')
 def cur_user():
+    "Test api for current_user"
     return "{}".format(current_user.username)
 
 
