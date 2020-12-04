@@ -3,6 +3,7 @@ import json
 from datetime import date
 import os
 import uuid
+
 from flask import render_template, request, session, redirect, Flask, flash
 from flask_login import login_user, current_user, LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
