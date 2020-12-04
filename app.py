@@ -172,14 +172,14 @@ def render_login():
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout():
-    "Logout a user"
+    """Logout a user."""
     logout_user()
     return redirect(url_for('/'))
 
 
 @app.route('/test/register/<username>/<password>')
 def test_register(username, password):
-    """Route for test register"""
+    """Route for test register."""
     user = User(username=username, hashed_password=int(password))
     scoped_session = db.create_scoped_session()
     res = db_manager.DBManager(scoped_session).add_user(user)
@@ -191,7 +191,7 @@ def test_register(username, password):
 
 @app.route('/test/login/<username>/<password>')
 def test_login(username, password):
-    """Route for test login"""
+    """Route for test login."""
     user = User.query.filter_by(username=username).first()
 
     # user exist and password matched
@@ -203,7 +203,7 @@ def test_login(username, password):
 
 @app.route('/test/current_user')
 def cur_user():
-    "Test api for current_user"
+    """Test api for current_user."""
     return "{}".format(current_user.username)
 
 
