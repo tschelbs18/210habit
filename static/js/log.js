@@ -27,16 +27,10 @@ class HabitManager {
 	/**
 	 * Managers habit requests and updates to the server.
 	 * @constructor
-	 * @param {string} session_id - The session id of the current user
-	 * @param {string} user - The current user
-	 * @param {ZingGrid} zg - The zing grid object
 	 */
-	constructor(session_id, user, zg) {
-		// temporary while testing
-		this.session_id = session_id;
-		this.user = user;
-		this.zg = zg;
+	constructor() {
 		this.habits = [];
+		this.streaks = [];
 	}
 
 	/**
@@ -49,12 +43,11 @@ class HabitManager {
 		fetch('http://127.0.0.1:5000/api/habits', {credentials: 'include'})
 		  .then(
 			function(response) {
-
 				document.getElementById('loader-page').style.display='none';
 				document.getElementById('loader-spinner').style.display='none';
 
 			  if (response.status !== 200) {
-				console.log('Looks like there was a problem. Status Code: ' +
+					console.log('Looks like there was a problem. Status Code: ' +
 				  response.status);
 				return;
 			  }
@@ -70,15 +63,9 @@ class HabitManager {
 		  )
 		  .catch(function(err) {
 			console.log('Fetch Error :-S', err);
-
-				document.getElementById('loader-page').style.display='none';
-				document.getElementById('loader-spinner').style.display='none';
-
-				// temporary while testing
-				mgr.renderRows();
+			document.getElementById('loader-page').style.display='none';
+			document.getElementById('loader-spinner').style.display='none';
 		  });
-		
-
 	}
 
 	/**
@@ -88,15 +75,20 @@ class HabitManager {
 	 */
 	addHabit(habit)
 	{
-		console.log("attempting to add habit: " + habit);
 		var mgr = this;
+		if(mgr.habits.indexOf(habit) != -1)
+		{
+			// warn habit already exists
+			return;
+		}
+		console.log("attempting to add habit: " + habit);
 		fetch('http://127.0.0.1:5000/api/habits', {
 			method: 'post',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'habitname='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'habitname='+habit
 		  })
 		  .then(
 			function(response) {
@@ -114,12 +106,6 @@ class HabitManager {
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);
-			// test only, add anyways:
-			var zg = document.querySelector('zing-grid');
-			zg.insertRow(        {
-				"habit": habit,
-				"streak": 0
-			});
 		  });
 	}
 
@@ -131,13 +117,13 @@ class HabitManager {
 	deleteHabit(habit)
 	{
 		var mgr = this;
-		fetch('http://127.0.0.1:5000/api/habits/'+habit, {
+		fetch('http://127.0.0.1:5000/api/habits/', {
 			method: 'delete',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'habitname='+habit
 		  })
 		  .then(
 			function(response) {
@@ -167,7 +153,8 @@ class HabitManager {
 		{
 			data.push({'habit':this.habits[i], 'streak':this.streaks[i]});
 		}
-		this.zg.setData(data);
+		var zg = document.querySelector('zing-grid');
+		zg.setData(data);
 
 		// update the callback handlers
 		var log_buttons = document.getElementsByClassName('log-button');
@@ -186,8 +173,6 @@ class HabitManager {
 	 */
 	logHabit(habit)
 	{
-		let today = new Date()
-		var timestamp = today.toISOString().split('T')[0] // YYYY-MM-DD format
 		var mgr = this;
 		fetch('http://127.0.0.1:5000/api/habits/logs', {
 			method: 'post',
@@ -195,14 +180,14 @@ class HabitManager {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'day_to_log='+timestamp+'&habitname='+habit+'&user='+mgr.user+'&session_id='+mgr.session_id
+			body: 'habitname='+habit
 		  })
 		  .then(
 			function(response) {
 				if (response.status !== 200) {
-				console.log('Looks like there was a problem. Status Code: ' +
-				  response.status);
-				return;
+					console.log('Looks like there was a problem. Status Code: ' +
+					response.status);
+					return;
 				}
 
 				console.log('Successfull activity post:', habit, timestamp);
@@ -216,7 +201,7 @@ class HabitManager {
 window.addEventListener('load', (event) => {
 	const zgRef = document.querySelector('zing-grid');
 
-	let manager = new HabitManager('0','user',zgRef);
+	let manager = new HabitManager(zgRef);
 
 	zgRef.executeOnLoad(function() {
 		manager.requestHabits();

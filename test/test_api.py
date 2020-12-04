@@ -75,7 +75,9 @@ def test_habit():
 
             # delete a habit
             response3 = c.delete(
-                '/api/habits/reading',
+                '/api/habits/',
+                data={'habitname': 'reading'},
+                content_type='application/x-www-form-urlencoded'
             )
             assert response3.status_code == 200
 
