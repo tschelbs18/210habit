@@ -12,3 +12,4 @@ Flask-Login==0.5.0
 result==0.5.0
 Flask-SQLAlchemy==2.4.4
 flask-restful==0.3.6
+selenium==3.141.0
