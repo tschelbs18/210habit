@@ -8,7 +8,7 @@ from selenium.common.exceptions import TimeoutException
 
 
 options = webdriver.ChromeOptions()
-# options.add_argument('-headless')
+options.add_argument('-headless')
 
 
 def expand_shadow_element(driver, element):
@@ -395,8 +395,6 @@ class TestLoginInvalidUsername():
                     "return arguments[0].validity.valid", u)
                 assert (not is_valid), "invalid email address message not show"
 
-
-
             ustr = 'usertest@mail.'
             pstr = 'password123'
             username = driver.find_elements_by_xpath(
@@ -424,6 +422,7 @@ class TestLoginInvalidUsername():
         print("close website")
         time.sleep(3)
         self.driver.close()
+
 
 class TestLogInFail():
 
