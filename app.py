@@ -105,7 +105,7 @@ def get_all_activites():
     username = current_user.username
     result = db_manager.get_all_activities(username)
     if result.is_ok():
-        #return json.dumps(result.unwrap(), cls=AlchemyEncoder), 200
+        # return json.dumps(result.unwrap(), cls=AlchemyEncoder), 200
         return result.unwrap()
     else:
         return "Cannot get habit logs", 404
