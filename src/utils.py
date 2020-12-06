@@ -60,10 +60,8 @@ def get_activity_streak(activities):
 
 class AlchemyEncoder(json.JSONEncoder):
     """AlchemyEncoder for habit server."""
-
     def default(self, obj):
         """Unwrap Result object and serialize to Json.
-
         :param result Result: returned result of db_manager
         :returns Json: Json object
         """
@@ -76,11 +74,12 @@ class AlchemyEncoder(json.JSONEncoder):
                 try:
                     # this will fail on non-encodable values, like other
                     # classes
+                    if field == 'timestamp':
+                        data = data.strftime("%Y-%m-%d")
                     json.dumps(data)
                     fields[field] = data
                 except TypeError:
                     fields[field] = None
             # a json-encodable dict
             return fields
-
         return json.JSONEncoder.default(self, obj)
