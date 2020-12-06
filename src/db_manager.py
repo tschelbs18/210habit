@@ -157,8 +157,23 @@ class DBManager():
             UserActivity.timestamp < end_time)
 
         activities = query.all()
+        '''
+        id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+        username = db.Column(db.String)
+        habitname = db.Column(db.String)
+        timestamp = db.Column(db.DateTime)
+        '''
+        # Key is habitname and values is an array of timestamps and 1s
+        activity_dict = {}
+        for activity in activities:
+            if activity.habitname in activity_dict:
+                activity_dict[activity.habitname].append([activity.timestamp.strftime("%Y-%m-%d"), 1])
+            else:
+                activity_dict[activity.habitname] = [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
 
-        return Result.Ok(activities)
+        print(activity_dict)
+
+        return Result.Ok(activity_dict)
 
     def get_activities(self, habit, trailing_days=100):
         """Get all the activities for a particular habit.
