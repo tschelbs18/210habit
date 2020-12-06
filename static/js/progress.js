@@ -140,7 +140,7 @@ async function renderHabitCharts() {
   // Render the relevant charts for the user's habit activity over the most recent 3 months.
   // Get the habit information for the current user.
   var habitList = await requestHabits();
-  console.log(habitList)
+  console.log(habitList);
   // Get the needed date information to build the calendar.
   var dates = getRelevantDates(new Date());
   // Get root node within which we will insert new html elements.
@@ -155,9 +155,7 @@ async function renderHabitCharts() {
   }
 
   // Loop over the array of habits and add a header and chart.
-  for (i = 0; i < habitList.length; i++) {
-    var habitinfo = habitList[i];
-    var habitname = habitinfo['habitname']
+  for (var habitname of Object.keys(habitList)) {
     // Create a header element with the name of the habit
     var header = document.createElement("H2");
     var headerText = document.createTextNode(habitname);
@@ -177,7 +175,7 @@ async function renderHabitCharts() {
         text: dates['year'],
         visible: true
       },
-      values: habitinfo['date_values']
+      values: habitList[habitname]
     },
      // pads spacing around the chart
      plotarea: {
