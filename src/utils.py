@@ -61,7 +61,7 @@ def get_activity_streak(activities):
 
 class AlchemyEncoder(json.JSONEncoder):
     """AlchemyEncoder for habit server."""
-    
+
     def default(self, obj):
         """Unwrap Result object and serialize to Json.
 
