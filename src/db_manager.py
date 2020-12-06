@@ -167,9 +167,11 @@ class DBManager():
         activity_dict = {}
         for activity in activities:
             if activity.habitname in activity_dict:
-                activity_dict[activity.habitname].append([activity.timestamp.strftime("%Y-%m-%d"), 1])
+                activity_dict[activity.habitname].append(
+                [activity.timestamp.strftime("%Y-%m-%d"), 1])
             else:
-                activity_dict[activity.habitname] = [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
+                activity_dict[activity.habitname] = \
+                [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
 
         print(activity_dict)
 
