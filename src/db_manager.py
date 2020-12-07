@@ -1,5 +1,5 @@
 """Database manager for the habit server."""
-import datetime
+from datetime import datetime
 from result.result import Result
 from src.db_models import User, UserActivity, UserHabit
 from src.utils import is_valid_email_addr, get_activity_streak
@@ -135,6 +135,7 @@ class DBManager():
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot add activity")
         else:
+            activity.timestamp = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
             self._session.add(activity)
             self._session.commit()
 

@@ -52,7 +52,7 @@ def get_activity_streak(activities):
         elif today == date:
             day_to_check -= timedelta(days=1)
         else:
-            break
+            continue
 
         streak += 1
 
