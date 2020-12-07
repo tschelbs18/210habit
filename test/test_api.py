@@ -30,14 +30,21 @@ def test_user():
             )
             assert response3.status_code == 302
 
-            # login with wrong pwd
+            # logout successful
             response4 = c.post(
+                '/api/logout',
+                content_type='application/x-www-form-urlencoded'
+            )
+            assert response4.status_code == 302
+
+            # login with wrong pwd
+            response5 = c.post(
                 '/api/login',
                 data=json.dumps(
                     {'username': 'jane@gmail.com', 'password': 'wrongpwd'}),
                 content_type='application/json',
             )
-            assert response4.status_code == 404
+            assert response5.status_code == 404
 
 
 def test_habit():
