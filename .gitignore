@@ -4,5 +4,4 @@ __pycache__/
 *.DS_STORE
 env/
 *.sqlite
-
-
+*vscode*
