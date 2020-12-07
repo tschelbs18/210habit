@@ -76,11 +76,15 @@ class HabitManager {
 	addHabit(habit)
 	{
 		var mgr = this;
+		console.log(mgr.habits);
 		if(mgr.habits.indexOf(habit) != -1)
 		{
 			// warn habit already exists
+			console.log("Duplicate habit ignored!");
 			return;
 		}
+		document.getElementById('loader-page').style.display='block';
+		document.getElementById('loader-spinner').style.display='block';
 		console.log("attempting to add habit: " + habit);
 		fetch('http://127.0.0.1:5000/api/habits', {
 			method: 'post',
@@ -95,6 +99,8 @@ class HabitManager {
 				if (response.status !== 201) {
 				console.log('Looks like there was a problem. Status Code: ' +
 				  response.status);
+				document.getElementById('loader-page').style.display='none';
+				document.getElementById('loader-spinner').style.display='none';
 					return;
 				}
 
@@ -103,6 +109,8 @@ class HabitManager {
 					"habit": habit,
 					"streak": 0
 				});
+				
+				mgr.habits.push(habit);
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);
@@ -211,7 +219,7 @@ window.addEventListener('load', (event) => {
 
 	let manager = new HabitManager(zgRef);
 
-	zgRef.executeOnLoad(function() {
+	zgRef.executeOnLoad(async function() {
 		manager.requestHabits();
 		
 		// request habit logs to ensure we disable the log button
@@ -275,9 +283,8 @@ window.addEventListener('load', (event) => {
 		var input = document.getElementById('new-habit');
 		if(input.value != '')
 		{
-			document.getElementById('loader-page').style.display='block';
-			document.getElementById('loader-spinner').style.display='block';
 			manager.addHabit(input.value);
+			input.value = '';
 		}
 	});
 });
