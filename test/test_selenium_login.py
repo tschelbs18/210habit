@@ -25,6 +25,8 @@ def run_server():
 class TestSignUp():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_signup(self):
