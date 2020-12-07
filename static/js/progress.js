@@ -83,7 +83,7 @@ async function renderHabitCharts() {
 	root.appendChild(habit_div);
     // Create a header element with the name of the habit
     var header = document.createElement("H2");
-    var headerText = document.createTextNode(habitname);
+    var headerText = document.createTextNode(habitname + " Progress");
     header.appendChild(headerText);
     habit_div.appendChild(header);
     // Create a div element in which to render that habit's chart and set the id to the name of the habit
