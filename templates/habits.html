@@ -6,6 +6,7 @@
   <meta charset="utf-8">
   <title>Log Habits</title>
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
   <script src="static/js/log.js"></script>
 </head>
@@ -15,7 +16,7 @@
     <div class="inner-wrap">
       <nav id="main-menu">
         <ul class="nav-bar">
-          <li>Habit Tracker</li>
+          <li><img src="/static/img/habit_tracker_logo.jpg"></img></li>
           <li class="active"><a class="nav-button" href="/habits">Habit Log</a></li>
           <li><a class="nav-button" href="/progress">Progress</a></li>
           <li><a class="nav-button" href="/logout">Logout</a></li>
