@@ -5,7 +5,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
-
+import app
+import multiprocessing
 
 options = webdriver.ChromeOptions()
 options.add_argument('-headless')
@@ -15,6 +16,10 @@ def expand_shadow_element(driver, element):
     shadow_root = driver.execute_script('return arguments[0].shadowRoot',
                                         element)
     return shadow_root
+
+
+def run_server():
+    app.app.run()
 
 
 class TestSignUp():
@@ -65,11 +70,14 @@ class TestSignUp():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestSignUpFail():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_signup_fail(self):
@@ -163,11 +171,14 @@ class TestSignUpFail():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestSignUpInvalidUsername():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_invalid_signup_email(self):
@@ -256,11 +267,14 @@ class TestSignUpInvalidUsername():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestLogIn():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_login(self):
@@ -328,11 +342,14 @@ class TestLogIn():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestLoginInvalidUsername():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_invalid_login_email(self):
@@ -422,11 +439,14 @@ class TestLoginInvalidUsername():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestLogInFail():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_login_fail(self):
@@ -503,3 +523,4 @@ class TestLogInFail():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()

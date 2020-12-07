@@ -2,16 +2,20 @@ import random
 import string
 from selenium import webdriver
 import time
+import app
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
-
+import multiprocessing
 
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
+
+
+def run_server():
+    app.app.run()
 
 
 def expand_shadow_element(driver, element):
@@ -51,6 +55,8 @@ def custom_wait_clickable_and_click(wait, selector, attempts=3):
 class TestCreateHabit():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_create(self):
@@ -136,6 +142,7 @@ class TestCreateHabit():
                         assert False, ("button is not clickable")
 
                     else:
+                        time.sleep(1)
                         # create = driver.find_element_by_xpath(
                         #     "//button[@id ='add']")
                         # create.click()
@@ -169,6 +176,7 @@ class TestCreateHabit():
                     assert False, ("button is not clickable")
 
                 else:
+                    time.sleep(1)
                     ct = ct+1
                     xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
                     try:
@@ -211,11 +219,14 @@ class TestCreateHabit():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestStreak():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_log_button_streak(self):
@@ -287,6 +298,8 @@ class TestStreak():
                 for streak in streak_list:
                     sv = int(''.join(filter(str.isdigit, streak.text)))
                     sl.append(sv)
+                    print(sv)
+                    time.sleep(2)
                     assert sv == 0, "new habit streak is not 0"
 
                 for button in log_button:
@@ -304,6 +317,7 @@ class TestStreak():
                     # print(int(''.join(filter(str.isdigit, j.text))))
                     assert (i+1) == int(''.join(filter(str.isdigit, j.text))
                                         ), "wrong streak"
+                length = len(streak_list)
                 driver.refresh()
                 try:
                     WebDriverWait(driver, 10).until(  # waitforpage
@@ -321,6 +335,7 @@ class TestStreak():
                         ), "wrong streak after refresh"
                         print("{}{}".format(
                             i, int(''.join(filter(str.isdigit, j.text)))))
+                    assert length == len(streak_list), "refresh miss row"
                     print("log-button/streak ok")
                 driver.close()
                 self.driver = webdriver.Chrome(options=options)
@@ -392,17 +407,21 @@ class TestStreak():
                             assert (i+1) == int(
                                 ''.join(filter(str.isdigit, j.text))
                             ), "wrong streak after reopen"
+                        assert length == len(streak_list), "reopen miss row"
                         print("log-button/streak ok")
 
     def teardown_method(self, method):
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestDeleteHabit():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_delete_button(self):
@@ -571,14 +590,17 @@ class TestDeleteHabit():
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
-class TestLogDeleteUpdate():
+class TestLogDelete():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
-    def test_log_delete_update(self):
+    def test_log_delete_button(self):
         driver = self.driver
         # html_file = os.path.abspath(
         #     '.') + "/sandbox/grid_demo_habit_manager.html"
@@ -656,6 +678,7 @@ class TestLogDeleteUpdate():
                         assert False, ("button is not clickable")
 
                     else:
+                        time.sleep(1)
                         ct = ct+1
                         xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
                         try:
@@ -723,48 +746,32 @@ class TestLogDeleteUpdate():
                         # time.sleep(5)
                         tmp = tmp - 1
 
-                new_habit = driver.find_element_by_xpath(
-                    "//input[@id ='new-habit']")
+    def teardown_method(self, method):
 
-                ct = len(driver.find_elements_by_xpath(
-                    "//zing-grid/zg-body/zg-row[not(@hidden)]"))
-                for i in range(10, 15):
-                    habit = get_random_string(i)
-                    new_habit.clear()
-                    new_habit.send_keys(habit)
-                    time.sleep(1)  # cause error if not wait
-                    try:
-                        wait = WebDriverWait(driver, 10)
-                        custom_wait_clickable_and_click(
-                            wait, (By.XPATH, "//button[@id ='add']"))
-                    except TimeoutException:
-                        assert False, ("button is not clickable")
+        driver = self.driver
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.TAG_NAME, "zg-head-cell"))
+            )
+        except TimeoutException:
+            assert False, ("load fail")
+        else:
+            remove_button = driver.find_elements_by_xpath(
+                "//zg-body//zg-button[@action = 'removerecord']")
+            # assert len(remove_button) > 0, "not read"
+            length = len(remove_button)
+            tmp = length
+            dialog = driver.find_element_by_xpath("//zg-dialog")
+            sr = driver.execute_script(
+                'return arguments[0].shadowRoot', dialog)
+            # '.querySelector("button.zg-dialog-confirm")'
+            delete = sr.find_element_by_css_selector(
+                "button.zg-dialog-confirm")
 
-                    else:
-                        ct = ct+1
-                        xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
-                        try:
-                            WebDriverWait(driver, 10).until(
-                                EC.presence_of_element_located((By.XPATH, xp))
-                            )
-                        except TimeoutException:
-                            # driver.get_screenshot_as_file("create.png")
-                            assert False, ("not create habit")
+            for button in remove_button:
+                driver.execute_script("arguments[0].click()", button)
 
-                        else:
-                            assert habit == driver.find_element_by_xpath(
-                                "(//zg-body/zg-row[not (@hidden)])[last()]/"
-                                "zg-cell[2]").text, "Wrong Habit Name"
-
-                # update habit name
-                habit1 = driver.find_element_by_xpath(
-                    "(//zg-body/zg-row[not (@hidden)])[1]/"
-                    "zg-cell[2]")
-                # habit2 = driver.find_element_by_xpath(
-                #     "(//zg-body/zg-row[not (@hidden)])[2]/"
-                #     "zg-cell[2]")
-                actionChains = ActionChains(driver)
-                actionChains.double_click(habit1).perform()
                 try:
                     WebDriverWait(driver, 10).until(
                         EC.presence_of_element_located(
@@ -773,141 +780,23 @@ class TestLogDeleteUpdate():
                 except TimeoutException:
                     assert False, ("load slowly")
                 else:
-                    dialog = driver.find_element_by_xpath("//zg-dialog")
-                    sr = driver.execute_script(
-                        'return arguments[0].shadowRoot', dialog)
-                    # '.querySelector("button.zg-dialog-confirm")'
-                    submit = sr.find_element_by_css_selector(
-                        "button.zg-dialog-confirm")
-                    update = sr.find_element_by_css_selector(
-                        "input")
-                    uhabit = 'running'
-
-                    update.clear()
-                    update.send_keys(uhabit)
-
-                    submit.click()
-                    try:
-                        xp = "".join(("((//zg-body/zg-row[not (@hidden)])[1]/"
-                                      "zg-cell[2])/"
-                                      "div[text()=\"", uhabit, "\"]"))
-                        print(xp)
-                        print(driver.find_element_by_xpath(
-                            "(//zg-body/zg-row[not (@hidden)])[1]/"
-                            "zg-cell[2]").text)
-                        WebDriverWait(driver, 10).until(
-                            EC.presence_of_element_located((By.XPATH, xp))
-                        )
-                    except TimeoutException:
-                        assert False, ("not update habit")
-
-                    else:
-                        assert uhabit == driver.find_element_by_xpath(
-                            "(//zg-body/zg-row[not (@hidden)])[1]/"
-                            "zg-cell[2]").text, "Wrong Habit Name"
-
-                # log_button
-                log_button = driver.find_elements_by_xpath(
-                    "//zg-body//zg-button[@class = 'log-button']")
-                streak_list = driver.find_elements_by_xpath(
-                    "//zg-body//zg-cell[@data-field-index='streak']/div")
-                sl = []
-                for streak in streak_list:
-                    sl.append(int(''.join(filter(str.isdigit, streak.text))))
-                # driver.find_element_by_xpath("//form[@id='loginForm']")
-                for button in log_button:
-                    # driver.execute_script("document.getElementsByClassName('log-button')[0].click()")
-                    time.sleep(1)
-                    driver.execute_script("arguments[0].click()", button)
-
-                streak_list = driver.find_elements_by_xpath(
-                    "//zg-body/zg-row[not (@hidden)]/zg-cell"
-                    "[@data-field-index='streak']")
-                for i, j in zip(sl, streak_list):
-                    # print(type(i))
-                    print(int(''.join(filter(str.isdigit, j.text))))
-                    assert (i+1) == int(''.join(filter(str.isdigit, j.text))
-                                        ), "wrong streak after update"
-
-                # delete button
-                remove_button = driver.find_elements_by_xpath(
-                    "//zg-body//zg-button[@action = 'removerecord']")
-                length = len(remove_button)
-                tmp = length
-                delete = driver.execute_script(
-                    'return document.querySelector("zg-dialog").shadowRoot.'
-                    'querySelector("button.zg-dialog-confirm")')
-                if delete is None:
-                    print("null")
-
-                for button in remove_button:
-
-                    driver.execute_script("arguments[0].click()", button)
-                    # time.sleep(5)
-                    try:
-                        WebDriverWait(driver, 10).until(
-                            EC.presence_of_element_located(
-                                (By.XPATH, "//zg-dialog[@open]"))
-                        )
-                    except TimeoutException:
-                        assert False, ("load slowly")
-                    else:
-                        delete.click()
-                        assert (length-len(driver.find_elements_by_xpath(
-                            "(//zing-grid/zg-body/zg-row"
-                            "[@hidden])"))) == tmp - 1, "Wrong delete"
-                        # time.sleep(5)
-                        streak_list = driver.find_elements_by_xpath(
-                            "//zg-body//zg-cell"
-                            "[@data-field-index='streak']/div")
-                        sl.pop()
-                        for i, j in zip(sl, streak_list):
-                            # print(type(i))
-                            print(int(''.join(filter(str.isdigit, j.text))))
-                            assert (i+1) == int(
-                                ''.join(filter(str.isdigit, j.text))
-                            ), "wrong streak"
-                        tmp = tmp - 1
-
-    def teardown_method(self, method):
-        driver = self.driver
-        remove_button = driver.find_elements_by_xpath(
-            "//zg-body//zg-button[@action = 'removerecord']")
-        # assert len(remove_button) > 0, "not read"
-        length = len(remove_button)
-        tmp = length
-        dialog = driver.find_element_by_xpath("//zg-dialog")
-        sr = driver.execute_script(
-            'return arguments[0].shadowRoot', dialog)
-        # '.querySelector("button.zg-dialog-confirm")'
-        delete = sr.find_element_by_css_selector(
-            "button.zg-dialog-confirm")
-
-        for button in remove_button:
-            driver.execute_script("arguments[0].click()", button)
-
-            try:
-                WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, "//zg-dialog[@open]"))
-                )
-            except TimeoutException:
-                assert False, ("load slowly")
-            else:
-                delete.click()
-                # checkfordeleteonerow
-                remain = driver.find_elements_by_xpath(
-                    "//zing-grid/zg-body/zg-row[not(@hidden)]")
-                assert (tmp - 1) == (len(remain)), "Wrong delete"
-                tmp = tmp - 1
+                    delete.click()
+                    # checkfordeleteonerow
+                    remain = driver.find_elements_by_xpath(
+                        "//zing-grid/zg-body/zg-row[not(@hidden)]")
+                    assert (tmp - 1) == (len(remain)), "Wrong delete"
+                    tmp = tmp - 1
         print("close website")
         # time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestHabit():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_habit(self):
@@ -993,6 +882,7 @@ class TestHabit():
                         assert False, ("button is not clickable")
 
                     else:
+                        time.sleep(1)
                         ct = ct+1
                         xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
                         try:
@@ -1066,7 +956,7 @@ class TestHabit():
                     habit = get_random_string(i)
                     new_habit.clear()
                     new_habit.send_keys(habit)
-                    time.sleep(1)
+
                     try:
                         wait = WebDriverWait(driver, 10)
                         custom_wait_clickable_and_click(
@@ -1075,8 +965,10 @@ class TestHabit():
                         assert False, ("button is not clickable")
 
                     else:
+                        time.sleep(1)
                         ct = ct+1
-                        xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
+                        xp = "(//zg-body/zg-row[not (@hidden)])"
+                        "[{}]/zg-cell[2]".format(ct)
                         try:
                             WebDriverWait(driver, 10).until(
                                 EC.presence_of_element_located((By.XPATH, xp))
@@ -1087,8 +979,8 @@ class TestHabit():
 
                         else:
                             assert habit == driver.find_element_by_xpath(
-                                "(//zg-body/zg-row[not (@hidden)])[last()]/"
-                                "zg-cell[2]").text, "Wrong Habit Name"
+                                "(//zg-body/zg-row[not (@hidden)])[last()]"
+                                "/zg-cell[2]").text, "Wrong Habit Name"
 
                 # log_button
                 log_button = driver.find_elements_by_xpath(
@@ -1155,43 +1047,54 @@ class TestHabit():
 
     def teardown_method(self, method):
         driver = self.driver
-        remove_button = driver.find_elements_by_xpath(
-            "//zg-body//zg-button[@action = 'removerecord']")
-        # assert len(remove_button) > 0, "not read"
-        length = len(remove_button)
-        tmp = length
-        dialog = driver.find_element_by_xpath("//zg-dialog")
-        sr = driver.execute_script(
-            'return arguments[0].shadowRoot', dialog)
-        # '.querySelector("button.zg-dialog-confirm")'
-        delete = sr.find_element_by_css_selector(
-            "button.zg-dialog-confirm")
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.TAG_NAME, "zg-head-cell"))
+            )
+        except TimeoutException:
+            assert False, ("load fail")
+        else:
+            remove_button = driver.find_elements_by_xpath(
+                "//zg-body//zg-button[@action = 'removerecord']")
+            # assert len(remove_button) > 0, "not read"
+            length = len(remove_button)
+            tmp = length
+            dialog = driver.find_element_by_xpath("//zg-dialog")
+            sr = driver.execute_script(
+                'return arguments[0].shadowRoot', dialog)
+            # '.querySelector("button.zg-dialog-confirm")'
+            delete = sr.find_element_by_css_selector(
+                "button.zg-dialog-confirm")
 
-        for button in remove_button:
-            driver.execute_script("arguments[0].click()", button)
+            for button in remove_button:
+                driver.execute_script("arguments[0].click()", button)
 
-            try:
-                WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, "//zg-dialog[@open]"))
-                )
-            except TimeoutException:
-                assert False, ("load slowly")
-            else:
-                delete.click()
-                # checkfordeleteonerow
-                remain = driver.find_elements_by_xpath(
-                    "//zing-grid/zg-body/zg-row[not(@hidden)]")
-                assert (tmp - 1) == (len(remain)), "Wrong delete"
-                tmp = tmp - 1
+                try:
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, "//zg-dialog[@open]"))
+                    )
+                except TimeoutException:
+                    assert False, ("load slowly")
+                else:
+                    delete.click()
+                    # checkfordeleteonerow
+                    remain = driver.find_elements_by_xpath(
+                        "//zing-grid/zg-body/zg-row[not(@hidden)]")
+                    assert (tmp - 1) == (len(remain)), "Wrong delete"
+                    tmp = tmp - 1
         print("close website")
         time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
 
 
 class TestWithoutLogIn():
 
     def setup_method(self, method):
+        self.proc = multiprocessing.Process(target=run_server, args=())
+        self.proc.start()
         self.driver = webdriver.Chrome(options=options)
 
     def test_without_login(self):
@@ -1222,3 +1125,4 @@ class TestWithoutLogIn():
         print("close website")
         # time.sleep(3)
         self.driver.close()
+        self.proc.terminate()
