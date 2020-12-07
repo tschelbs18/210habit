@@ -154,12 +154,22 @@ def test_get_activity_streak():
         act1 = UserActivity(
             username='joe@gmail.com',
             habitname='running',
-            timestamp=datetime.datetime.now() - datetime.timedelta(days=1)
+            timestamp=datetime.datetime.now(),
         )
         act2 = UserActivity(
             username='joe@gmail.com',
             habitname='running',
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=1)
+        )
+        act3 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
             timestamp=datetime.datetime.now() - datetime.timedelta(days=2)
+        )
+        act4 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=3)
         )
 
         # try getting streak with no existing user or habit
@@ -174,11 +184,21 @@ def test_get_activity_streak():
         assert streak == 0
 
         # add activity. It is too old, streak still == 0
-        assert db_man.add_activity(act2).is_ok()
+        assert db_man.add_activity(act4).is_ok()
         streak = db_man.get_activity_streak(habit).unwrap()
         assert streak == 0
 
-        # add another activity, this time streak == 2
+        # add another activity, this time streak == 1
         assert db_man.add_activity(act1).is_ok()
         streak = db_man.get_activity_streak(habit).unwrap()
+        assert streak == 1
+
+        # add another activity, this time streak == 2
+        assert db_man.add_activity(act2).is_ok()
+        streak = db_man.get_activity_streak(habit).unwrap()
         assert streak == 2
+
+        # add another activity, this time streak == 4
+        assert db_man.add_activity(act3).is_ok()
+        streak = db_man.get_activity_streak(habit).unwrap()
+        assert streak == 4

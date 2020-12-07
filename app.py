@@ -3,7 +3,7 @@ import json
 from datetime import date
 import os
 import uuid
-from flask import render_template, request, redirect, Flask, url_for
+from flask import render_template, request, redirect, Flask, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_login import LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
@@ -32,6 +32,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'db.sqlite')
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    """Redirect to login page if not logged in."""
+    return redirect('/login')
 
 
 @login_manager.user_loader
@@ -137,7 +143,8 @@ def login():
     password = data.get('password')
     user = db_manager._session.query(User).filter_by(username=username).first()
     if not user or not user.check_password(password):
-        return "login failed", 404
+        flash('Login failed')
+        return render_template('login.html'), 404
     login_user(user)
 
     return redirect('/habits')
@@ -156,7 +163,8 @@ def register():
     if result.is_ok():
         return render_template('login.html', name=user.username)
     else:
-        return "register failed", 404
+        flash('Registration failed')
+        return render_template('login.html'), 404
 
 
 @app.route('/', methods=['GET'])
@@ -205,12 +213,14 @@ def cur_user():
 
 
 @app.route('/habits', methods=['GET'])
+@login_required
 def render_habits():
     """Render habits page."""
     return render_template('habits.html')
 
 
 @app.route('/progress', methods=['GET'])
+@login_required
 def render_progress():
     """Render progress page."""
     return render_template('progress.html')
