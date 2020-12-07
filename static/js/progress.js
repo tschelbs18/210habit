@@ -155,10 +155,9 @@ async function renderHabitCharts() {
 	
 	var showHabit = document.getElementById(habit_sel);
 	showHabit.style.display = 'block';
-	
-	console.log('displaying elem: ' + showHabit);
   });
   
-  // display the first elem by default
+	document.getElementById('loader-page').style.display='none';
+	document.getElementById('loader-spinner').style.display='none';
   
 }
