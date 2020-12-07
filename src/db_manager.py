@@ -140,6 +140,41 @@ class DBManager():
 
             return Result.Ok()
 
+    def get_all_activities(self, user):
+        """Get all the activities for a particular habit.
+
+        :param str username: username to query.
+        :return Result: operation result, Ok or Err
+        """
+        trailing_days = 100
+        query = self._session.query(UserActivity).filter(
+            UserActivity.username == user)
+
+        end_time = datetime.datetime.now()
+        start_time = end_time - datetime.timedelta(days=trailing_days)
+        query = query.filter(
+            UserActivity.timestamp > start_time,
+            UserActivity.timestamp < end_time)
+
+        activities = query.all()
+        '''
+        id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+        username = db.Column(db.String)
+        habitname = db.Column(db.String)
+        timestamp = db.Column(db.DateTime)
+        '''
+        # Key is habitname and values is an array of timestamps and 1s
+        activity_dict = {}
+        for activity in activities:
+            if activity.habitname in activity_dict:
+                activity_dict[activity.habitname].append(
+                    [activity.timestamp.strftime("%Y-%m-%d"), 1])
+            else:
+                activity_dict[activity.habitname] = \
+                    [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
+
+        return Result.Ok(activity_dict)
+
     def get_activities(self, habit, trailing_days=100):
         """Get all the activities for a particular habit.
 
