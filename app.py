@@ -4,8 +4,8 @@ from datetime import date
 import os
 import uuid
 
-from flask import render_template, request, session, redirect, Flask, flash
-from flask_login import login_user, current_user, LoginManager
+from flask import render_template, request, session, redirect, Flask
+from flask_login import login_user, current_user, LoginManager, login_required
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
 from src.utils import AlchemyEncoder
@@ -32,6 +32,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'db.sqlite')
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    """Redirect to login page if not logged in."""
+    return redirect('/login')
 
 
 @login_manager.user_loader
@@ -208,12 +214,14 @@ def cur_user():
 
 
 @app.route('/habits', methods=['GET'])
+@login_required
 def render_habits():
     """Render habits page."""
     return render_template('habits.html')
 
 
 @app.route('/progress', methods=['GET'])
+@login_required
 def render_progress():
     """Render progress page."""
     return render_template('progress.html')
