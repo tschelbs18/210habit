@@ -22,7 +22,7 @@
   color: white;
 }
 
-#main-menu .nav-bar li:hover {
+#main-menu .nav-bar li:not(:first-child):hover {
   background-color:#a7d4fe;
   border-bottom:2px solid #1a6cfc;
 }
@@ -33,7 +33,7 @@
 .nav-button {
   font-weight: bold;
 }
-.active {
+#main-menu .nav-bar li .active {
 	border-bottom:2px solid #1a6cfc;
 }
 .alert {
