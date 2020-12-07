@@ -4,7 +4,7 @@ from datetime import date
 import os
 import uuid
 from flask import render_template, request, session, redirect, Flask, flash
-from flask_login import login_user, current_user, LoginManager
+from flask_login import login_user, current_user, LoginManager, login_required
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
 from src.utils import AlchemyEncoder
@@ -26,6 +26,12 @@ db.create_all()
 db_manager = DBManager(db.session)
 
 
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    """Redirect to login page if not logged in."""
+    return redirect('/login')
+
+
 @login_manager.user_loader
 def load_user(username):
     """Retrive current user."""
@@ -33,6 +39,7 @@ def load_user(username):
 
 
 @app.route('/api/habits', methods=['GET'])
+@login_required
 def get_habits():
     """Get habits for a user."""
     result = db_manager.get_habits(current_user)
@@ -51,6 +58,7 @@ def get_habits():
 
 
 @app.route('/api/habits', methods=['POST'])
+@login_required
 def add_habit():
     """Add a habit."""
     userhabit = UserHabit(
@@ -65,6 +73,7 @@ def add_habit():
 
 
 @app.route('/api/habits/<habitname>', methods=['DELETE'])
+@login_required
 def delete_habit(habitname):
     """Delete a habit.
 
@@ -82,6 +91,7 @@ def delete_habit(habitname):
 
 
 @app.route('/api/habits/logs', methods=['GET'])
+@login_required
 def get_activites():
     """Get activities for a user."""
     userhabit = UserHabit(
@@ -98,6 +108,7 @@ def get_activites():
 
 
 @app.route('/api/habits/logs', methods=['POST'])
+@login_required
 def add_activites():
     """Add activities for a habit."""
     timestamp = date.fromisoformat(
@@ -155,12 +166,14 @@ def render_login():
 
 
 @app.route('/habits', methods=['GET'])
+@login_required
 def render_habits():
     """Render habits page."""
     return render_template('habits.html')
 
 
 @app.route('/progress', methods=['GET'])
+@login_required
 def render_progress():
     """Render progress page."""
     return render_template('progress.html')
