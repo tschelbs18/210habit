@@ -45,11 +45,12 @@ def get_activity_streak(activities):
         if day_to_check - date == timedelta(days=0):
             # check that there is an activity entry for an expected day
             day_to_check -= timedelta(days=1)
-
         elif today - date == timedelta(days=1):
             # streak is still valid if we have not logged anything today
             # but there is a log from yesterday
             day_to_check -= timedelta(days=2)
+        elif today == date:
+            day_to_check -= timedelta(days=1)
         else:
             break
 
