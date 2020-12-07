@@ -3,24 +3,38 @@
   margin-top: 40px;
 }
 #main-menu .nav-bar li {
+	color: #white;
   padding:0 10px;
    display:table-cell;
    vertical-align: middle;
+   background-color: #0099FF;
+   border-right:1px solid white;
 }
+#main-menu .nav-bar li:first-of-type {
+   background-color: white;
+}
+
 #main-menu .nav-bar li a {
   text-decoration: none;
-  padding-left: 25px;
+  padding-left: 15px;
+  padding-right: 15px;
   text-transform: uppercase;
-  color: rgb(19, 35, 47);
+  color: white;
 }
+
+#main-menu .nav-bar li:hover {
+  background-color:#a7d4fe;
+  border-bottom:2px solid #1a6cfc;
+}
+
 #main-menu .nav-bar li img {
 	max-width: 200px;
 }
 .nav-button {
   font-weight: bold;
 }
-.active > a{
-	text-decoration: underline !important;
+.active {
+	border-bottom:2px solid #1a6cfc;
 }
 .alert {
   color: red;
@@ -60,11 +74,11 @@ body {
 }
 a {
   text-decoration: none;
-  color: #1ab188;
+  color: #0099FF;
   transition:.5s ease;
 }
 a:hover {
-  color: #179b77;
+  color: #1d9be2;
 }
 .form {
   background: rgba(19, 35, 47, .9);
@@ -80,11 +94,11 @@ a:hover {
   margin:0 0 40px 0;
 }
 .tab-group .active a {
-  background:#1ab188;
+  background:#0099FF;
   color:#ffffff;
 }
 .tab-group li a:hover {
-  background:#179b77;
+  background:#1d9be2;
   color:#ffffff;
 }
 .tab-group li a {
@@ -92,7 +106,7 @@ a:hover {
   text-decoration:none;
   padding:15px;
   background:rgba(160, 179, 176, .25);
-  color:#a0b3b0;
+  color:#a0a2b3;
   font-size:20px;
   float:left;
   width:50%;
@@ -126,7 +140,7 @@ label {
 }
 label .req {
   margin:2px;
-  color:#1ab188;
+  color:#0099FF;
 }
 label.active {
   transform:translateY(50px);
@@ -147,17 +161,17 @@ input, textarea {
   padding:5px 10px;
   background:none;
   background-image:none;
-  border:1px solid #a0b3b0;
+  border:1px solid #a0a2b3;
   color:#ffffff;
   border-radius:0;
   transition:border-color .25s ease, box-shadow .25s ease;
 }
 input:focus, textarea.focus {
   outline:0;
-  border-color:#1ab188;
+  border-color:#0099FF;
 }
 textarea {
-  border:2px solid #a0b3b0;
+  border:2px solid #a0a2b3;
   resize: vertical;
 }
 .field-wrap {
@@ -173,13 +187,13 @@ textarea {
   font-weight:600;
   text-transform:uppercase;
   letter-spacing:.1em;
-  background:#1ab188;
+  background:#0099FF;
   color:#ffffff;
   transition:all.5s ease;
   -webkit-appearance: none;
 }
 .button:hover, .button:focus {
-  background:#179b77;
+  background:#1d9be2;
 }
 .button-block {
   display:block;
@@ -267,5 +281,12 @@ zg-button:hover {
 	cursor:pointer;
 }
 
+zg-caption {
+    background-color: #0099FF !important;
+}
+
+#content {
+	margin-top: 20px;
+}
 
 /***************************/
