@@ -132,7 +132,7 @@ class HabitManager {
 	deleteHabit(habit)
 	{
 		var mgr = this;
-		fetch('http://127.0.0.1:5000/api/habits/', {
+		fetch('http://127.0.0.1:5000/api/habits', {
 			method: 'delete',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
