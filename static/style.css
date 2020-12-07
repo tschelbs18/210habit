@@ -1,5 +1,3 @@
-/* adapted from https://codepen.io/ehermanson/pen/KwKWEv & https://codepen.io/Cheesetoast/pen/qACsJ & https://codepen.io/cbracco/pen/zekgx */
-
 #main-menu .nav-bar {
   list-style:none;
   margin-top: 40px;
@@ -28,19 +26,22 @@
 * {
   margin: 0;
 }
-html, body {
-    min-height: calc(100% - 30px);
-    height: calc(100% - 30px);
-}
-.page-wrap {
-  height: calc(100% - 30px);
-}
-.site-footer {
-  height: 50px;
-}
-.site-footer {
-  background: #0099FF;
+footer {
+  background: white;
   text-align: center;
+  height: 30px;
+  margin-top: -30px;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+}
+.outer-wrap {
+  min-height: 100%;
+}
+.inner-wrap {
+  padding: 20px;
+  padding-bottom: 30px;
 }
 *, *:before, *:after {
   box-sizing: border-box;

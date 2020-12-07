@@ -10,7 +10,8 @@
 
 <body>
   <!-- adapted from https://codepen.io/ehermanson/pen/KwKWEv -->
-    <div class="page-wrap">
+  <div class="outer-wrap">
+    <div class="inner-wrap">
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           {% for message in messages %}
@@ -82,13 +83,15 @@
 
       </div>
     </div>
+  </div>
 
-        <footer class="site-footer">
-          <img src="/static/img/AppLogo210white.png" alt="Apperture Labs logo" height="30px">
-        </footer>
+  <footer>
+    <img src="/static/img/AppLogo210.png" alt="Apperture Labs logo" height="30px">
+  </footer>
 
-      <script src="/static/js/login.js"></script>
 
-    </body>
+  <script src="/static/js/login.js"></script>
 
-    </html>
+</body>
+
+</html>
