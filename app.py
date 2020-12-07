@@ -81,16 +81,15 @@ def add_habit():
         return "cannot add habit ", 404
 
 
-@app.route('/api/habits/<habitname>', methods=['DELETE'])
-@login_required
-def delete_habit(habitname):
+@app.route('/api/habits', methods=['DELETE'])
+def delete_habit():
     """Delete a habit.
 
     :param habitname str: name of habit to delete
     """
     userhabit = UserHabit(
         username=current_user.username,
-        habitname=habitname
+        habitname=request.form['habitname']
     )
     result = db_manager.delete_habit(userhabit)
     if result.is_ok():

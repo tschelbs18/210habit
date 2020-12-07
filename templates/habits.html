@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/static/style.css">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <script src="https://cdn.zinggrid.com/dev/zinggrid-dev.min.js" defer></script>
-  <script src="static/js/habit_manager.js"></script>
+  <script src="static/js/log.js"></script>
 </head>
 
 <body>
@@ -26,10 +26,9 @@
       <div id="content">
         <zing-grid
         caption="Log Habit"
-        editor="modal"
         layout="row"
         layout-controls="disabled"
-        viewport-stop>
+		sort>
         <zg-colgroup>
           <zg-column type="custom" header="Log Habit">
             <zg-button class="log-button">
