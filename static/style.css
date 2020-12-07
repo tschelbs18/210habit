@@ -153,7 +153,7 @@ label.active .req {
 label.highlight {
 	color:#ffffff;
 }
-input, textarea {
+.field-wrap input, #new-habit, textarea {
   font-size:22px;
   display:block;
   width:100%;
@@ -166,7 +166,7 @@ input, textarea {
   border-radius:0;
   transition:border-color .25s ease, box-shadow .25s ease;
 }
-input:focus, textarea.focus {
+.field-wrap input:focus, #new-habit:focus, .field-wrap textarea.focus {
   outline:0;
   border-color:#0099FF;
 }
