@@ -25,22 +25,26 @@
   text-align: center;
   font-weight: bold;
 }
-footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 10vh;
-  background-color: #0099FF;
-  color: rgb(19, 35, 47);
+* {
+  margin: 0;
+}
+html, body {
+  height: 100%;
+}
+.page-wrap {
+  min-height: 100%;
+  margin-bottom: -30px;
+}
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+.site-footer, .page-wrap:after {
+  height: 30px;
+}
+.site-footer {
+  background: #0099FF;
   text-align: center;
-  padding: 5px;
-}
-.page-container {
-  position:relative;
-  min-height: 90vh;
-}
-.content-wrapper {
-  padding-bottom: 3rem;
 }
 *, *:before, *:after {
   box-sizing: border-box;
