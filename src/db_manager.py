@@ -173,8 +173,6 @@ class DBManager():
                 activity_dict[activity.habitname] = \
                     [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
 
-        print(activity_dict)
-
         return Result.Ok(activity_dict)
 
     def get_activities(self, habit, trailing_days=100):
