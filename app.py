@@ -189,7 +189,7 @@ def render_login():
 def logout():
     """Logout a user."""
     logout_user()
-    return redirect(url_for('/'))
+    return redirect('/')
 
 
 @app.route('/test/register/<username>/<password>')
