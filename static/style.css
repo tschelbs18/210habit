@@ -289,4 +289,13 @@ zg-caption {
 	margin-top: 20px;
 }
 
+h2 {
+    background-color: #1a6bfb;
+    color: white;
+    padding: 5px;	
+}
+
+#zing-placeholder {
+	padding-top:15px;
+}
 /***************************/
