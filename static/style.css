@@ -5,14 +5,18 @@
   margin-top: 40px;
 }
 #main-menu .nav-bar li {
-  display:inline;
   padding:0 10px;
+   display:table-cell;
+   vertical-align: middle;
 }
 #main-menu .nav-bar li a {
   text-decoration: none;
   padding-left: 25px;
   text-transform: uppercase;
   color: rgb(19, 35, 47);
+}
+#main-menu .nav-bar li img {
+	max-width: 200px;
 }
 .nav-button {
   font-weight: bold;
