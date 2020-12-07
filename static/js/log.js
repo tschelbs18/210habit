@@ -11,15 +11,22 @@ function log_callback(handler, manager, e)
 		button = button.parentElement; // checkmark or text element in button target
 	}
 
-	button.disabled = true;
-	button.removeEventListener(e.type, handler);
-	var habit = button.parentElement.parentElement.nextElementSibling.textContent;
-	var streak = button.parentElement.parentElement.nextElementSibling.nextElementSibling;
-	var new_streak = parseInt(streak.getAttribute('value')) + 1;
-	streak.setAttribute('value',new_streak.toString());
-	streak.innerHTML = "🔥 " + new_streak;
-	
-	manager.logHabit(habit);
+	if(button.disabled)
+	{
+		button.removeEventListener(e.type, handler);
+	}
+	else
+	{
+		button.disabled = true;
+		button.removeEventListener(e.type, handler);
+		var habit = button.parentElement.parentElement.nextElementSibling.textContent;
+		var streak = button.parentElement.parentElement.nextElementSibling.nextElementSibling;
+		var new_streak = parseInt(streak.getAttribute('value')) + 1;
+		streak.setAttribute('value',new_streak.toString());
+		streak.innerHTML = "🔥 " + new_streak;
+		
+		manager.logHabit(habit);
+	}
 }
 
 /** This class manages retrieving habits from the server and rendering them in a Zing Grid on the page. */
@@ -43,9 +50,6 @@ class HabitManager {
 		fetch('http://127.0.0.1:5000/api/habits', {credentials: 'include'})
 		  .then(
 			function(response) {
-				document.getElementById('loader-page').style.display='none';
-				document.getElementById('loader-spinner').style.display='none';
-
 			  if (response.status !== 200) {
 					console.log('Looks like there was a problem. Status Code: ' +
 				  response.status);
@@ -63,8 +67,6 @@ class HabitManager {
 		  )
 		  .catch(function(err) {
 			console.log('Fetch Error :-S', err);
-			document.getElementById('loader-page').style.display='none';
-			document.getElementById('loader-spinner').style.display='none';
 		  });
 	}
 
@@ -142,6 +144,7 @@ class HabitManager {
 				}
 
 				console.log('Successfully delete habit:', habit);
+				mgr.habits.pop(habit);
 		  })
 		  .catch(function (error) {
 			console.log('Request failed', error);
@@ -166,6 +169,7 @@ class HabitManager {
 
 		// update the callback handlers
 		var log_buttons = document.getElementsByClassName('log-button');
+		console.log(log_buttons);
 		for (i=0; i < log_buttons.length; i++)
 		{
 			log_buttons[i].addEventListener("click", function handler(e) {
@@ -182,13 +186,18 @@ class HabitManager {
 	logHabit(habit)
 	{
 		var mgr = this;
+		let today = new Date();
+		var localOffset = today.getTimezoneOffset() * 60000;
+		var localTime = today.getTime();
+		today = new Date(localTime - localOffset);
+		var timestamp = today.toISOString().split('T')[0] // YYYY-MM-DD format
 		fetch('http://127.0.0.1:5000/api/habits/logs', {
 			method: 'post',
 			headers: {
 			  "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
 			},
 			credentials: 'include',
-			body: 'habitname='+habit
+			body: 'habitname='+habit+'&day_to_log='+timestamp
 		  })
 		  .then(
 			function(response) {
@@ -210,7 +219,6 @@ async function requestHabitLogs()
 {
   let response = await fetch('http://127.0.0.1:5000/api/habits/all_logs', {credentials: 'include'});
   let data = await response.json();
-  console.log(data);
   return data;
 }
 
@@ -229,29 +237,41 @@ window.addEventListener('load', (event) => {
 		var localOffset = today.getTimezoneOffset() * 60000;
 		var localTime = today.getTime();
 		today = new Date(localTime - localOffset);
-		var timestamp = today.toISOString().split('T')[0] // YYYY-MM-DD format
+		var timestamp = today.toISOString().split('T')[0]; // YYYY-MM-DD format
 		
 		var already_logged = [];
-		var habits = [];
 		for (var habitname of Object.keys(habitList)) {
-			habits.push(habitname);
-			dates = habitList[habitname]['date_values']
+			dates = habitList[habitname];
 			if(dates.length > 0)
 			{
 				var most_recent_log = dates[dates.length-1][0];
 				if(most_recent_log == timestamp)
 				{
+					console.log('already logged today: '+habitname);
 					already_logged.push(habitname);
 				}
 			}
 		}
 		
-		log_buttons = document.getElementsByClassName("log-button");
+		await new Promise(resolve => setTimeout(resolve, 100));
+		
+		habits = [];
+		log_buttons = [];
+		//iterate over all habits, pulling the habit values
+		var habit_rows = document.querySelectorAll("zg-cell[aria-colindex='1']");
+		habit_rows.forEach(function(habit_row) {
+			habits.push(habit_row.textContent);
+			log_buttons.push(habit_row.previousElementSibling.firstElementChild.firstElementChild);
+		});
+		
+		//log_buttons = document.getElementsByClassName("log-button");
 		already_logged.forEach(function(habit) {
 			var button_to_disable = habits.indexOf(habit);
 			log_buttons[button_to_disable].disabled = true;
-			log_buttons[button_to_disable].removeEventListener('click', window.handler);
 		});
+		
+		document.getElementById('loader-page').style.display='none';
+		document.getElementById('loader-spinner').style.display='none';
 	});
 
 	// Customize delete record dialog
