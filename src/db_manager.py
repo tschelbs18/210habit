@@ -135,7 +135,9 @@ class DBManager():
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot add activity")
         else:
-            activity.timestamp = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
+            activity.timestamp = datetime.strptime(
+                datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d"
+            )
             self._session.add(activity)
             self._session.commit()
 
