@@ -130,6 +130,7 @@ def login():
 
     return redirect('/habits')
 
+
 @app.route('/api/logout', methods=['POST'])
 def logout():
     """Logout a user."""
@@ -137,6 +138,7 @@ def logout():
     logout_user()
 
     return redirect('/login')
+
 
 @app.route('/api/users', methods=['POST'])
 def register():
