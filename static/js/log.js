@@ -37,7 +37,7 @@ class HabitManager {
 	 */
 	constructor() {
 		this.habits = [];
-		this.streaks = [];
+		this.streaks = {};
 	}
 
 	/**
@@ -60,7 +60,12 @@ class HabitManager {
 			  response.json().then(function(data) {
 				console.log(data);
 				mgr.habits = data.habits;
-				mgr.streaks = data.streaks; //tbd determine format of streaks in endpoint
+				var i;
+				for(i = 0; i < mgr.habits.length; i++)
+				{
+					mgr.streaks[data.habits[i]] = data.streaks[i];
+				}
+				mgr.habits.sort(); // render habits in alphabetical order
 				mgr.renderRows(); // due to async nature, we call here
 			  });
 			}
@@ -162,7 +167,7 @@ class HabitManager {
 		var data = [];
 		for(var i = 0; i < this.habits.length; i++)
 		{
-			data.push({'habit':this.habits[i], 'streak':this.streaks[i]});
+			data.push({'habit':this.habits[i], 'streak':this.streaks[this.habits[i]]});
 		}
 		var zg = document.querySelector('zing-grid');
 		zg.setData(data);
@@ -206,7 +211,7 @@ class HabitManager {
 					response.status);
 					return;
 				}
-
+				mgr.streaks[habit] += 1;
 				console.log('Successfull activity post:', habit, timestamp);
 		  })
 		  .catch(function (error) {
