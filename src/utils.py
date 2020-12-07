@@ -77,11 +77,12 @@ class AlchemyEncoder(json.JSONEncoder):
                 try:
                     # this will fail on non-encodable values, like other
                     # classes
+                    if field == 'timestamp':
+                        data = data.strftime("%Y-%m-%d")
                     json.dumps(data)
                     fields[field] = data
                 except TypeError:
                     fields[field] = None
             # a json-encodable dict
             return fields
-
         return json.JSONEncoder.default(self, obj)

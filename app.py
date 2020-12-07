@@ -99,6 +99,17 @@ def delete_habit(habitname):
         return "cannot delete habit ", 404
 
 
+@app.route('/api/habits/all_logs', methods=['GET'])
+def get_all_activites():
+    """Get all activities for a user."""
+    username = current_user.username
+    result = db_manager.get_all_activities(username)
+    if result.is_ok():
+        return result.unwrap()
+    else:
+        return "Cannot get habit logs", 404
+
+
 @app.route('/api/habits/logs', methods=['GET'])
 @login_required
 def get_activites():
