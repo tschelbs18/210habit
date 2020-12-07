@@ -198,6 +198,14 @@ class HabitManager {
 	}
 }
 
+async function requestHabitLogs()
+{
+  let response = await fetch('http://127.0.0.1:5000/api/habits/all_logs', {credentials: 'include'});
+  let data = await response.json();
+  console.log(data);
+  return data;
+}
+
 window.addEventListener('load', (event) => {
 	const zgRef = document.querySelector('zing-grid');
 
@@ -205,6 +213,37 @@ window.addEventListener('load', (event) => {
 
 	zgRef.executeOnLoad(function() {
 		manager.requestHabits();
+		
+		// request habit logs to ensure we disable the log button
+		var habitList = await requestHabitLogs();
+
+		let today = new Date();
+		var localOffset = today.getTimezoneOffset() * 60000;
+		var localTime = today.getTime();
+		today = new Date(localTime - localOffset);
+		var timestamp = today.toISOString().split('T')[0] // YYYY-MM-DD format
+		
+		var already_logged = [];
+		var habits = [];
+		for (var habitname of Object.keys(habitList)) {
+			habits.push(habitname);
+			dates = habitList[habitname]['date_values']
+			if(dates.length > 0)
+			{
+				var most_recent_log = dates[dates.length-1][0];
+				if(most_recent_log == timestamp)
+				{
+					already_logged.push(habitname);
+				}
+			}
+		}
+		
+		log_buttons = document.getElementsByClassName("log-button");
+		already_logged.forEach(function(habit) {
+			var button_to_disable = habits.indexOf(habit);
+			log_buttons[button_to_disable].disabled = true;
+			log_buttons[button_to_disable].removeEventListener('click', window.handler);
+		});
 	});
 
 	// Customize delete record dialog
