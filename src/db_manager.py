@@ -140,38 +140,47 @@ class DBManager():
 
             return Result.Ok()
 
-    def get_all_activities(self, user):
+    def get_all_activities(self, user, trailing_days=100):
         """Get all the activities for a particular habit.
 
         :param str username: username to query.
         :return Result: operation result, Ok or Err
         """
-        trailing_days = 100
-        query = self._session.query(UserActivity).filter(
-            UserActivity.username == user)
 
-        end_time = datetime.datetime.now()
-        start_time = end_time - datetime.timedelta(days=trailing_days)
-        query = query.filter(
-            UserActivity.timestamp > start_time,
-            UserActivity.timestamp < end_time)
+        print('\n\nCalling get_all_activities')
+        result = self.get_habits(user)
+        activities_and_streaks = []
 
-        activities = query.all()
-        '''
-        id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-        username = db.Column(db.String)
-        habitname = db.Column(db.String)
-        timestamp = db.Column(db.DateTime)
-        '''
-        # Key is habitname and values is an array of timestamps and 1s
+        # Get all activities+streaks for all habits
+        for habit in result.unwrap():
+            activity_result = self.get_activities(habit, trailing_days=None)
+            activities = activity_result.unwrap()
+
+            for activity in activities:
+                streak = get_activity_streak(activities, current_date=activity.timestamp)
+                activities_and_streaks.append((activity, streak))
+
+        # filter for activities within last trailing_days
+        cutoff_date = datetime.datetime.now() - datetime.timedelta(days=trailing_days)
+
+        activities_and_streaks = list(filter(
+            lambda x: x[0].timestamp > cutoff_date, activities_and_streaks
+        ))
+
+        # Build dictionary of activity and streak in format that ZingGrid
+        # expects
         activity_dict = {}
-        for activity in activities:
+        for activity,streak in activities_and_streaks:
             if activity.habitname in activity_dict:
                 activity_dict[activity.habitname].append(
-                    [activity.timestamp.strftime("%Y-%m-%d"), 1])
+                    (activity.timestamp.strftime("%Y-%m-%d"), streak))
             else:
                 activity_dict[activity.habitname] = \
-                    [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
+                    [(activity.timestamp.strftime("%Y-%m-%d"), streak)]
+
+        # remove duplicates
+        for habitname, entries in activity_dict.items():
+            activity_dict[habitname] = sorted(list(set(entries)))
 
         return Result.Ok(activity_dict)
 

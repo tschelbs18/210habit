@@ -202,3 +202,44 @@ def test_get_activity_streak():
         assert db_man.add_activity(act3).is_ok()
         streak = db_man.get_activity_streak(habit).unwrap()
         assert streak == 4
+
+
+def test_get_all_activities():
+    with DBManagerTestFixture() as db_man:
+        user = User(username='joe@gmail.com', hashed_password='password')
+        habit = UserHabit(
+            username='joe@gmail.com',
+            habitname='running',
+        )
+        act1 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
+            timestamp=datetime.datetime.now(),
+        )
+        act2 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=1)
+        )
+        act3 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=2)
+        )
+        act4 = UserActivity(
+            username='joe@gmail.com',
+            habitname='running',
+            timestamp=datetime.datetime.now() - datetime.timedelta(days=4)
+        )
+
+        # add user and habit
+        assert db_man.add_user(user).is_ok()
+        assert db_man.add_habit(habit).is_ok()
+
+        # 
+        assert db_man.add_activity(act1).is_ok()
+        assert db_man.add_activity(act2).is_ok()
+        assert db_man.add_activity(act3).is_ok()
+        assert db_man.add_activity(act4).is_ok()
+
+        print(db_man.get_all_activities(user))
