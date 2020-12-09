@@ -183,9 +183,7 @@ class DBManager():
                 activity_dict[activity.habitname] = \
                     [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
         for habit in habits:
-            if habit.habitname in activity_dict:
-                pass
-            else:
+            if habit.habitname not in activity_dict:
                 activity_dict[habit.habitname] = []
 
         return Result.Ok(activity_dict)
