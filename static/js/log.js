@@ -258,6 +258,8 @@ window.addEventListener('load', (event) => {
 			}
 		}
 		
+		console.log("Already logged: " + already_logged);
+		
 		await new Promise(resolve => setTimeout(resolve, 100));
 		
 		habits = [];
@@ -269,10 +271,12 @@ window.addEventListener('load', (event) => {
 			log_buttons.push(habit_row.previousElementSibling.firstElementChild.firstElementChild);
 		});
 		
-		//log_buttons = document.getElementsByClassName("log-button");
 		already_logged.forEach(function(habit) {
 			var button_to_disable = habits.indexOf(habit);
-			log_buttons[button_to_disable].disabled = true;
+			if(button_to_disable != -1) {
+				console.log(button_to_disable);
+				log_buttons[button_to_disable].disabled = true;
+			}
 		});
 		
 		document.getElementById('loader-page').style.display='none';
@@ -306,9 +310,11 @@ window.addEventListener('load', (event) => {
 	var btn = document.getElementById('add');
 	btn.addEventListener("click", function add(e) {
 		var input = document.getElementById('new-habit');
-		if(input.value != '')
+		var new_habit = input.value;
+		new_habit = new_habit.replace(/(^[ '\^\$\*#&]+)|([ '\^\$\*#&]+$)/g, '') // strip whitespace
+		if(new_habit != '')
 		{
-			manager.addHabit(input.value);
+			manager.addHabit(new_habit);
 			input.value = '';
 		}
 	});
