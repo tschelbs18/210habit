@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 .inner-wrap img {
-    max-width: 200px;
+    max-width: 250px;
+	margin: auto;
+    display: block;
 }
 
 #main-menu .nav-bar {
