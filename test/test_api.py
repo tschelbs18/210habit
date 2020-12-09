@@ -9,7 +9,7 @@ def test_user():
             # register a new user
             response1 = c.post(
                 '/api/users',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response1.status_code == 200
@@ -17,7 +17,7 @@ def test_user():
             # add duplicate user
             response2 = c.post(
                 '/api/users',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response2.status_code == 404
@@ -25,7 +25,7 @@ def test_user():
             # login successful
             response3 = c.post(
                 '/api/login',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response3.status_code == 302
@@ -46,14 +46,14 @@ def test_habit():
             # register a new user
             response_user = c.post(
                 '/api/users',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response_user.status_code == 200
             # login
             response_login = c.post(
                 '/api/login',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response_login.status_code == 302
@@ -88,7 +88,7 @@ def test_activity():
             # register
             response_user = c.post(
                 '/api/users',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response_user.status_code == 200
@@ -96,7 +96,7 @@ def test_activity():
             # login
             response_login = c.post(
                 '/api/login',
-                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                data={'username': 'jane@gmail.com', 'password': 'pwdpwd'},
                 content_type='application/x-www-form-urlencoded'
             )
             assert response_login.status_code == 302  # redirect to habits
@@ -132,3 +132,15 @@ def test_activity():
                 content_type='application/x-www-form-urlencoded'
             )
             assert response4.status_code == 200
+
+
+def test_password_too_short():
+    with DBManagerTestFixture():
+        with app.test_client() as c:
+            # register
+            response_user = c.post(
+                '/api/users',
+                data={'username': 'jane@gmail.com', 'password': 'pwd'},
+                content_type='application/x-www-form-urlencoded'
+            )
+            assert response_user.status_code == 404
