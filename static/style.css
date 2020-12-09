@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+.inner-wrap img {
+    max-width: 200px;
+}
+
 #main-menu .nav-bar {
   list-style:none;
   margin-top: 40px;
