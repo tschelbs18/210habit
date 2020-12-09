@@ -96,10 +96,18 @@ class DBManager():
             habitname=habit.habitname
         ).all()
 
+        # delete any activities for that habit
+        activities = self._session.query(UserActivity).filter_by(
+            username=habit.username,
+            habitname=habit.habitname
+        ).all()
+
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot delete")
         else:
             self._session.delete(habits[0])
+            for activity in activities:
+                self._session.delete(activity)
             self._session.commit()
 
             return Result.Ok()
@@ -146,6 +154,10 @@ class DBManager():
         :param str username: username to query.
         :return Result: operation result, Ok or Err
         """
+        # make sure user exists
+        if not self.does_user_exist(user):
+            return Result.Err("User does not exist, cannot get habits")
+
         trailing_days = 100
         query = self._session.query(UserActivity).filter(
             UserActivity.username == user)
@@ -157,12 +169,10 @@ class DBManager():
             UserActivity.timestamp < end_time)
 
         activities = query.all()
-        '''
-        id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-        username = db.Column(db.String)
-        habitname = db.Column(db.String)
-        timestamp = db.Column(db.DateTime)
-        '''
+
+        habits = self._session.query(UserHabit).filter_by(
+            username=user).all()
+
         # Key is habitname and values is an array of timestamps and 1s
         activity_dict = {}
         for activity in activities:
@@ -172,6 +182,9 @@ class DBManager():
             else:
                 activity_dict[activity.habitname] = \
                     [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
+        for habit in habits:
+            if habit.habitname not in activity_dict:
+                activity_dict[habit.habitname] = []
 
         return Result.Ok(activity_dict)
 
