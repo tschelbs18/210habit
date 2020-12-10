@@ -3,9 +3,9 @@ import json
 from datetime import date
 import os
 import uuid
-
-from flask import render_template, request, session, redirect, Flask
-from flask_login import login_user, current_user, LoginManager, login_required
+from flask import render_template, request, redirect, Flask, url_for, flash
+from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import LoginManager
 from src.db_models import User, UserActivity, UserHabit, db
 from src.db_manager import DBManager
 from src.utils import AlchemyEncoder
@@ -21,6 +21,7 @@ login_manager.init_app(app)
 login_manager.login_view = "/"
 login_manager.login_message = u"you must login to access this page"
 login_manager.login_message_category = "message"
+
 
 
 # db
@@ -156,8 +157,7 @@ def login():
     if not user or not user.check_password(password):
         flash('Login failed')
         return render_template('login.html'), 404
-    session['username'] = username
-   login_user(user)
+    login_user(user)
 
     return redirect('/habits')
 
