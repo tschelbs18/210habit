@@ -1,4 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+.inner-wrap img {
+    max-width: 250px;
+	margin: auto;
+    display: block;
+}
+
 #main-menu .nav-bar {
   list-style:none;
   margin-top: 40px;
@@ -45,6 +52,7 @@
   color: red;
   text-align: center;
   font-weight: bold;
+  margin-top:10px;
 }
 * {
   margin: 0;
@@ -184,6 +192,7 @@ textarea {
   margin-bottom:40px;
 }
 .button {
+  cursor: pointer;
   border:0;
   outline:none;
   border-radius:0;

@@ -13,15 +13,7 @@
   <!-- adapted from https://codepen.io/ehermanson/pen/KwKWEv -->
   <div class="outer-wrap">
     <div class="inner-wrap">
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            <p class="alert">
-              {{message}}
-            </p>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
+	<img src="/static/img/habit_tracker_logo.jpg"></img>
       <div class="form">
 
         <ul class="tab-group">
@@ -81,6 +73,16 @@
           </div>
 
         </div>
+
+			  {% with messages = get_flashed_messages() %}
+				{% if messages %}
+				  {% for message in messages %}
+					<p class="alert">
+					  {{message}}
+					</p>
+				  {% endfor %}
+				{% endif %}
+			  {% endwith %}
 
       </div>
     </div>
