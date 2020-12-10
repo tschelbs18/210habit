@@ -51,7 +51,7 @@ async function renderHabitCharts() {
   var dates = getRelevantDates(new Date());
   // Get root node within which we will insert new html elements.
   var root = document.getElementById('zing-placeholder');
-  
+
   // Handle the case that the user has no habits yet.
   if (habitList.length == 0) {
     // Add a header specifying no habits yet added to the DOM.
@@ -125,7 +125,7 @@ async function renderHabitCharts() {
   }
   
   // populate the dropdown with the habit names/ids
-    var select = document.getElementById("habit-select");
+  var select = document.getElementById("habit-select");
   var i;
   for(i = 0; i < habit_names.length; i++)
   {
@@ -137,7 +137,16 @@ async function renderHabitCharts() {
   
   // show the first elem by default
   var rendered = document.getElementsByClassName('habit-rendered');
-  rendered[0].style.display = 'block';
+  if(rendered.length > 0)
+  {
+	rendered[0].style.display = 'block';
+	select.style.display = 'inline-block';
+  }
+  else
+  {
+	  var prompt = document.getElementById('prompt');
+	  prompt.innerHTML = 'No habits to display. To create a new habit, use the <b>Create New Habit</b> button from the habit log.';
+  }
   
   // add the selection dropdown handler
   select.addEventListener('change', function(e){

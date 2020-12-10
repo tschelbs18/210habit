@@ -372,3 +372,7 @@ h2 {
 .select-css:disabled:hover, .select-css[aria-disabled=true] {
 	border-color: #aaa;
 }
+
+#habit-select {
+	display: none;
+}
