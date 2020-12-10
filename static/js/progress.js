@@ -59,6 +59,20 @@ async function renderHabitCharts() {
     header.appendChild(headerText);
     root.appendChild(header);
   }
+
+  // turn streaks for each activity into scaled color values
+  for (const [_, activities] of Object.entries(habitList)) {
+    var max_streak = activities[0][1];
+    for (i = 0; i < activities.length; i++) {
+      if (max_streak < activities[i][1]) {
+        max_streak = activities[i][1];
+      }
+    }
+    for (i = 0; i < activities.length; i++) {
+      activities[i][1] = 6*activities[i][1]/max_streak+1
+    }
+  }
+  
   // Sort the habitList alphabetically
   const orderedHabitList = {};
   Object.keys(habitList).sort().forEach(function(key) {
@@ -95,6 +109,9 @@ async function renderHabitCharts() {
       marginLeft:'10%',
       marginRight:'10%'
     },
+    // tooltip: {
+    //   visible: false
+    // }
     /* adds day labels to calender boxes
        plot: {
       valueBox: { // Use this object to configure the value boxes.

@@ -71,7 +71,7 @@ class DBManager():
     def get_habits(self, user):
         """Get habits for a particular user.
 
-        :param user User: [description]
+        :param user User: user to get habits from
         :returns Result: operation result, Ok or Err
         """
         # make sure user exists
@@ -143,11 +143,9 @@ class DBManager():
     def get_all_activities(self, user, trailing_days=100):
         """Get all the activities for a particular habit.
 
-        :param str username: username to query.
+        :param user User: user to get habits from
         :return Result: operation result, Ok or Err
         """
-
-        print('\n\nCalling get_all_activities')
         result = self.get_habits(user)
         activities_and_streaks = []
 
@@ -157,11 +155,13 @@ class DBManager():
             activities = activity_result.unwrap()
 
             for activity in activities:
-                streak = get_activity_streak(activities, current_date=activity.timestamp)
+                streak = get_activity_streak(
+                    activities, current_date=activity.timestamp)
                 activities_and_streaks.append((activity, streak))
 
         # filter for activities within last trailing_days
-        cutoff_date = datetime.datetime.now() - datetime.timedelta(days=trailing_days)
+        cutoff_date = \
+            datetime.datetime.now() - datetime.timedelta(days=trailing_days)
 
         activities_and_streaks = list(filter(
             lambda x: x[0].timestamp > cutoff_date, activities_and_streaks
@@ -170,7 +170,7 @@ class DBManager():
         # Build dictionary of activity and streak in format that ZingGrid
         # expects
         activity_dict = {}
-        for activity,streak in activities_and_streaks:
+        for activity, streak in activities_and_streaks:
             if activity.habitname in activity_dict:
                 activity_dict[activity.habitname].append(
                     (activity.timestamp.strftime("%Y-%m-%d"), streak))

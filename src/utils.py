@@ -26,8 +26,6 @@ def get_activity_streak(activities, current_date=datetime.now()):
     :param activities List[UserActivity]: list of activities
     :returns int: current activity streak
     """
-    print('\nCalling get_activity_streak ', [act.timestamp for act in activities])
-
     # only conisder year, month, day of dates
     dates = [
         datetime.strptime(
@@ -40,12 +38,11 @@ def get_activity_streak(activities, current_date=datetime.now()):
     dates = list(filter(lambda date: date <= current_date, dates))
     dates = sorted(list(set(dates)), reverse=True)
 
-    current_date = datetime.strptime(current_date.strftime("%Y-%m-%d"), "%Y-%m-%d")
-    day_to_check = current_date 
+    current_date = datetime.strptime(
+        current_date.strftime("%Y-%m-%d"), "%Y-%m-%d")
+    day_to_check = current_date
     streak = 0
 
-    print('Dates', dates)
-    print('Streak current date', current_date)
     for date in dates:
         if day_to_check - date == timedelta(days=0):
             # check that there is an activity entry for an expected day
@@ -60,8 +57,6 @@ def get_activity_streak(activities, current_date=datetime.now()):
             break
 
         streak += 1
-
-    print('Streak', streak)
 
     return streak
 

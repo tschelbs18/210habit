@@ -102,7 +102,6 @@ def delete_habit():
 def get_all_activites():
     """Get all activities for a user."""
     result = db_manager.get_all_activities(current_user)
-    print('get_all_activities return', json.dumps(result.unwrap()))
     if result.is_ok():
         return json.dumps(result.unwrap())
     else:
@@ -130,7 +129,6 @@ def get_activites():
 @login_required
 def add_activites():
     """Add activities for a habit."""
-    print('HERE')
     timestamp = date.fromisoformat(
         request.form['day_to_log']
     )

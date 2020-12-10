@@ -236,10 +236,7 @@ def test_get_all_activities():
         assert db_man.add_user(user).is_ok()
         assert db_man.add_habit(habit).is_ok()
 
-        # 
         assert db_man.add_activity(act1).is_ok()
         assert db_man.add_activity(act2).is_ok()
         assert db_man.add_activity(act3).is_ok()
         assert db_man.add_activity(act4).is_ok()
-
-        print(db_man.get_all_activities(user))
