@@ -51,6 +51,7 @@ async function renderHabitCharts() {
   var dates = getRelevantDates(new Date());
   // Get root node within which we will insert new html elements.
   var root = document.getElementById('zing-placeholder');
+  
   // Handle the case that the user has no habits yet.
   if (habitList.length == 0) {
     // Add a header specifying no habits yet added to the DOM.
@@ -79,17 +80,30 @@ async function renderHabitCharts() {
     orderedHabitList[key] = habitList[key];
   });
 
+  var habit_names = [];
+  var habit_ids = [];
+
   // Loop over the array of habits and add a header and chart.
   for (var habitname of Object.keys(orderedHabitList)) {
+    // create labeled container for the habit
+	var habitname_clean = habitname.replaceAll(' ','_');
+	habitname_clean = habitname_clean.toLowerCase();
+	habit_names.push(habitname)
+	var habit_div = document.createElement("div");
+	habit_div.id = habitname_clean + "_wrapper"
+	habit_div.classList.add("habit-rendered");
+	habit_ids.push(habit_div.id)
+	habit_div.style.display = 'none';
+	root.appendChild(habit_div);
     // Create a header element with the name of the habit
     var header = document.createElement("H2");
-    var headerText = document.createTextNode(habitname);
+    var headerText = document.createTextNode(habitname + " Progress");
     header.appendChild(headerText);
-    root.appendChild(header);
+    habit_div.appendChild(header);
     // Create a div element in which to render that habit's chart and set the id to the name of the habit
     var div = document.createElement("div");
-    div.setAttribute("id", habitname);
-    root.appendChild(div);
+    div.setAttribute("id", habitname_clean);
+    habit_div.appendChild(div);
     // Build a context dictionary for configuring the chart
     var myConfig = {
     type: 'calendar',
@@ -120,10 +134,47 @@ async function renderHabitCharts() {
   };
   // Render the ZingChart with the habit name for the respective div ID and current config of data.
   zingchart.render({
-    id: habitname,
+    id: habitname_clean,
     data: myConfig,
     height: 250,
     width: '60%'
   });
   }
+  
+  // populate the dropdown with the habit names/ids
+    var select = document.getElementById("habit-select");
+  var i;
+  for(i = 0; i < habit_names.length; i++)
+  {
+	var option = document.createElement("option");
+	option.value = habit_ids[i];
+	option.text = habit_names[i];
+	select.appendChild(option);
+  }
+  
+  // show the first elem by default
+  var rendered = document.getElementsByClassName('habit-rendered');
+  rendered[0].style.display = 'block';
+  
+  // add the selection dropdown handler
+  select.addEventListener('change', function(e){
+	var elem = e.target; 
+    var idx  = elem.selectedIndex;
+    var habit_sel = elem.options[idx].value;
+
+	// hide all previous
+	var rendered = document.getElementsByClassName('habit-rendered');
+	var i;
+	for(i = 0; i < rendered.length; i++)
+	{
+		rendered[i].style.display = 'none';
+	}
+	
+	var showHabit = document.getElementById(habit_sel);
+	showHabit.style.display = 'block';
+  });
+  
+	document.getElementById('loader-page').style.display='none';
+	document.getElementById('loader-spinner').style.display='none';
+  
 }

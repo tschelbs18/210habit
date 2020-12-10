@@ -96,10 +96,18 @@ class DBManager():
             habitname=habit.habitname
         ).all()
 
+        # delete any activities for that habit
+        activities = self._session.query(UserActivity).filter_by(
+            username=habit.username,
+            habitname=habit.habitname
+        ).all()
+
         if len(habits) == 0:
             return Result.Err("Habit does not exist, cannot delete")
         else:
             self._session.delete(habits[0])
+            for activity in activities:
+                self._session.delete(activity)
             self._session.commit()
 
             return Result.Ok()
@@ -147,8 +155,11 @@ class DBManager():
         :return Result: operation result, Ok or Err
         """
         result = self.get_habits(user)
-        activities_and_streaks = []
 
+        if not result.is_ok():
+            return result
+
+        activities_and_streaks = []
         # Get all activities+streaks for all habits
         for habit in result.unwrap():
             activity_result = self.get_activities(habit, trailing_days=None)

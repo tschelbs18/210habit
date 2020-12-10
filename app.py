@@ -167,13 +167,19 @@ def register():
     # TODO we might need also to check if data has username or password
     username = data.get('username')
     password = data.get('password')
+
+    if len(password) < 6:
+        flash('Registration failed: Password too short. Must be 6 characters')
+        return render_template('login.html'), 404
+
     user = User(username=username, hashed_password=password)
     user.set_password(password)
     result = db_manager.add_user(user)
+
     if result.is_ok():
         return render_template('login.html', name=user.username)
     else:
-        flash('Registration failed')
+        flash('Registration failed: ' + result.err())
         return render_template('login.html'), 404
 
 

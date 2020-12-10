@@ -1,6 +1,7 @@
 """Helper util to add activity logs into the DB for any day."""
 import requests
 
+
 def add_activity_to_db(username, password, habitname, day_to_log):
     """Post an activity log to the habit server API.
 
