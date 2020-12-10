@@ -35,6 +35,11 @@ jobs:
       run: |
         pydocstyle
 
+    - name: Python code coverage report
+      run: |
+        coverage run -m pytest
+        coverage report --include=./* -m
+
     - name: Build JSDoc
       uses: andstor/jsdoc-action@v1
       with:
