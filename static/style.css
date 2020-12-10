@@ -2,6 +2,8 @@
 #main-menu .nav-bar {
   list-style:none;
   margin-top: 40px;
+  margin-right:20px;
+  padding-bottom:60px;
 }
 #main-menu .nav-bar li {
 	color: #white;
@@ -13,16 +15,43 @@
   border-radius: 5px;
 }
 #main-menu .nav-bar li:first-of-type {
+   float:left;
    background-color: white;
 }
+#main-menu .nav-bar li:not(:last-of-type):not(:first-of-type) {
+	float:left;
+	padding-top:22px;
+	padding-bottom:22px;
 
-#main-menu .nav-bar li a {
+/*    background-color: white; */
+}
+#main-menu .nav-bar li:last-child {
+	float:right;
+	padding-top:20px;
+	padding-bottom:20px;
+	border-right:2px solid #0099ff;
+	border-left:2px solid #0099ff;
+	border-top:2px solid #0099ff;
+	border-bottom:2px solid #0099ff;
+   background-color: #ffffff;
+}
+
+#main-menu .nav-bar li a{
   text-decoration: none;
   padding-left: 15px;
   padding-right: 15px;
   text-transform: uppercase;
   color: white;
 }
+
+#main-menu > ul > li:nth-child(4) > a{
+  text-decoration: none;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-transform: uppercase;
+  color: #0099ff;
+}
+
 
 #main-menu .nav-bar li:not(:first-child):hover {
   background-color:#a7d4fe;
