@@ -123,9 +123,9 @@ async function renderHabitCharts() {
       marginLeft:'10%',
       marginRight:'10%'
     },
-    // tooltip: {
-    //   visible: false
-    // }
+    tooltip: {
+      visible: false
+    }
     /* adds day labels to calender boxes
        plot: {
       valueBox: { // Use this object to configure the value boxes.
