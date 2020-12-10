@@ -3,6 +3,7 @@ import string
 from selenium import webdriver
 import time
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
@@ -58,6 +59,7 @@ class TestCreateHabit():
         #     '.') + "/sandbox/grid_demo_habit_manager.html"
         # driver.get("file:" + html_file)
         driver.get("http://127.0.0.1:5000/")
+        driver.set_window_size(1920, 1080)
         # time.sleep(5)
         try:
             WebDriverWait(driver, 10).until(
@@ -303,12 +305,23 @@ class TestStreak():
                     assert (i+1) == int(''.join(filter(str.isdigit, j.text))
                                         ), "wrong streak"
                 driver.refresh()
-                streak_list = driver.find_elements_by_xpath(
-                    "//zg-body//zg-cell[@data-field-index='streak']/div")
-                for i, j in zip(sl, streak_list):
-                    assert (i+1) == int(''.join(filter(str.isdigit, j.text))
-                                        ), "wrong streak after refresh"
-                print("log-button/streak ok")
+                try:
+                    WebDriverWait(driver, 10).until(  # waitforpage
+                        EC.presence_of_element_located(
+                            (By.TAG_NAME, "zg-head-cell"))
+                    )
+                except TimeoutException:
+                    assert False, ("load slowly")
+                else:
+                    streak_list = driver.find_elements_by_xpath(
+                        "//zg-body//zg-cell[@data-field-index='streak']/div")
+                    for i, j in zip(sl, streak_list):
+                        assert (i+1) == int(
+                            ''.join(filter(str.isdigit, j.text))
+                        ), "wrong streak after refresh"
+                        print("{}{}".format(
+                            i, int(''.join(filter(str.isdigit, j.text)))))
+                    print("log-button/streak ok")
                 driver.close()
                 self.driver = webdriver.Chrome(options=options)
                 driver = self.driver
@@ -560,12 +573,12 @@ class TestDeleteHabit():
         self.driver.close()
 
 
-class TestLogDelete():
+class TestLogDeleteUpdate():
 
     def setup_method(self, method):
         self.driver = webdriver.Chrome(options=options)
 
-    def test_log_button_streak(self):
+    def test_log_delete_update(self):
         driver = self.driver
         # html_file = os.path.abspath(
         #     '.') + "/sandbox/grid_demo_habit_manager.html"
@@ -710,7 +723,183 @@ class TestLogDelete():
                         # time.sleep(5)
                         tmp = tmp - 1
 
+                new_habit = driver.find_element_by_xpath(
+                    "//input[@id ='new-habit']")
+
+                ct = len(driver.find_elements_by_xpath(
+                    "//zing-grid/zg-body/zg-row[not(@hidden)]"))
+                for i in range(10, 15):
+                    habit = get_random_string(i)
+                    new_habit.clear()
+                    new_habit.send_keys(habit)
+                    time.sleep(1)  # cause error if not wait
+                    try:
+                        wait = WebDriverWait(driver, 10)
+                        custom_wait_clickable_and_click(
+                            wait, (By.XPATH, "//button[@id ='add']"))
+                    except TimeoutException:
+                        assert False, ("button is not clickable")
+
+                    else:
+                        ct = ct+1
+                        xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
+                        try:
+                            WebDriverWait(driver, 10).until(
+                                EC.presence_of_element_located((By.XPATH, xp))
+                            )
+                        except TimeoutException:
+                            # driver.get_screenshot_as_file("create.png")
+                            assert False, ("not create habit")
+
+                        else:
+                            assert habit == driver.find_element_by_xpath(
+                                "(//zg-body/zg-row[not (@hidden)])[last()]/"
+                                "zg-cell[2]").text, "Wrong Habit Name"
+
+                # update habit name
+                habit1 = driver.find_element_by_xpath(
+                    "(//zg-body/zg-row[not (@hidden)])[1]/"
+                    "zg-cell[2]")
+                # habit2 = driver.find_element_by_xpath(
+                #     "(//zg-body/zg-row[not (@hidden)])[2]/"
+                #     "zg-cell[2]")
+                actionChains = ActionChains(driver)
+                actionChains.double_click(habit1).perform()
+                try:
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, "//zg-dialog[@open]"))
+                    )
+                except TimeoutException:
+                    assert False, ("load slowly")
+                else:
+                    dialog = driver.find_element_by_xpath("//zg-dialog")
+                    sr = driver.execute_script(
+                        'return arguments[0].shadowRoot', dialog)
+                    # '.querySelector("button.zg-dialog-confirm")'
+                    submit = sr.find_element_by_css_selector(
+                        "button.zg-dialog-confirm")
+                    update = sr.find_element_by_css_selector(
+                        "input")
+                    uhabit = 'running'
+
+                    update.clear()
+                    update.send_keys(uhabit)
+
+                    submit.click()
+                    try:
+                        xp = "".join(("((//zg-body/zg-row[not (@hidden)])[1]/"
+                                      "zg-cell[2])/"
+                                      "div[text()=\"", uhabit, "\"]"))
+                        print(xp)
+                        print(driver.find_element_by_xpath(
+                            "(//zg-body/zg-row[not (@hidden)])[1]/"
+                            "zg-cell[2]").text)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, xp))
+                        )
+                    except TimeoutException:
+                        assert False, ("not update habit")
+
+                    else:
+                        assert uhabit == driver.find_element_by_xpath(
+                            "(//zg-body/zg-row[not (@hidden)])[1]/"
+                            "zg-cell[2]").text, "Wrong Habit Name"
+
+                # log_button
+                log_button = driver.find_elements_by_xpath(
+                    "//zg-body//zg-button[@class = 'log-button']")
+                streak_list = driver.find_elements_by_xpath(
+                    "//zg-body//zg-cell[@data-field-index='streak']/div")
+                sl = []
+                for streak in streak_list:
+                    sl.append(int(''.join(filter(str.isdigit, streak.text))))
+                # driver.find_element_by_xpath("//form[@id='loginForm']")
+                for button in log_button:
+                    # driver.execute_script("document.getElementsByClassName('log-button')[0].click()")
+                    time.sleep(1)
+                    driver.execute_script("arguments[0].click()", button)
+
+                streak_list = driver.find_elements_by_xpath(
+                    "//zg-body/zg-row[not (@hidden)]/zg-cell"
+                    "[@data-field-index='streak']")
+                for i, j in zip(sl, streak_list):
+                    # print(type(i))
+                    print(int(''.join(filter(str.isdigit, j.text))))
+                    assert (i+1) == int(''.join(filter(str.isdigit, j.text))
+                                        ), "wrong streak after update"
+
+                # delete button
+                remove_button = driver.find_elements_by_xpath(
+                    "//zg-body//zg-button[@action = 'removerecord']")
+                length = len(remove_button)
+                tmp = length
+                delete = driver.execute_script(
+                    'return document.querySelector("zg-dialog").shadowRoot.'
+                    'querySelector("button.zg-dialog-confirm")')
+                if delete is None:
+                    print("null")
+
+                for button in remove_button:
+
+                    driver.execute_script("arguments[0].click()", button)
+                    # time.sleep(5)
+                    try:
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located(
+                                (By.XPATH, "//zg-dialog[@open]"))
+                        )
+                    except TimeoutException:
+                        assert False, ("load slowly")
+                    else:
+                        delete.click()
+                        assert (length-len(driver.find_elements_by_xpath(
+                            "(//zing-grid/zg-body/zg-row"
+                            "[@hidden])"))) == tmp - 1, "Wrong delete"
+                        # time.sleep(5)
+                        streak_list = driver.find_elements_by_xpath(
+                            "//zg-body//zg-cell"
+                            "[@data-field-index='streak']/div")
+                        sl.pop()
+                        for i, j in zip(sl, streak_list):
+                            # print(type(i))
+                            print(int(''.join(filter(str.isdigit, j.text))))
+                            assert (i+1) == int(
+                                ''.join(filter(str.isdigit, j.text))
+                            ), "wrong streak"
+                        tmp = tmp - 1
+
     def teardown_method(self, method):
+        driver = self.driver
+        remove_button = driver.find_elements_by_xpath(
+            "//zg-body//zg-button[@action = 'removerecord']")
+        # assert len(remove_button) > 0, "not read"
+        length = len(remove_button)
+        tmp = length
+        dialog = driver.find_element_by_xpath("//zg-dialog")
+        sr = driver.execute_script(
+            'return arguments[0].shadowRoot', dialog)
+        # '.querySelector("button.zg-dialog-confirm")'
+        delete = sr.find_element_by_css_selector(
+            "button.zg-dialog-confirm")
+
+        for button in remove_button:
+            driver.execute_script("arguments[0].click()", button)
+
+            try:
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, "//zg-dialog[@open]"))
+                )
+            except TimeoutException:
+                assert False, ("load slowly")
+            else:
+                delete.click()
+                # checkfordeleteonerow
+                remain = driver.find_elements_by_xpath(
+                    "//zing-grid/zg-body/zg-row[not(@hidden)]")
+                assert (tmp - 1) == (len(remain)), "Wrong delete"
+                tmp = tmp - 1
         print("close website")
         # time.sleep(3)
         self.driver.close()
@@ -727,6 +916,7 @@ class TestHabit():
         #     '.') + "/sandbox/grid_demo_habit_manager.html"
         # driver.get("file:" + html_file)
         driver.get("http://127.0.0.1:5000/")
+        driver.set_window_size(1920, 1080)
         try:
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.TAG_NAME, "button"))
@@ -870,7 +1060,6 @@ class TestHabit():
 
                 new_habit = driver.find_element_by_xpath(
                     "//input[@id ='new-habit']")
-                create = driver.find_element_by_xpath("//button[@id ='add']")
                 ct = len(driver.find_elements_by_xpath(
                     "//zing-grid/zg-body/zg-row[not(@hidden)]"))
                 for i in range(1, 10):
@@ -878,20 +1067,28 @@ class TestHabit():
                     new_habit.clear()
                     new_habit.send_keys(habit)
                     time.sleep(1)
-                    create.click()
-                    ct = ct+1
-                    xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
                     try:
-                        WebDriverWait(driver, 10).until(
-                            EC.presence_of_element_located((By.XPATH, xp))
-                        )
+                        wait = WebDriverWait(driver, 10)
+                        custom_wait_clickable_and_click(
+                            wait, (By.XPATH, "//button[@id ='add']"))
                     except TimeoutException:
-                        assert False, ("load slowly")
+                        assert False, ("button is not clickable")
 
-                    finally:
-                        assert habit == driver.find_element_by_xpath(
-                            "(//zg-body/zg-row[not (@hidden)])[last()]/"
-                            "zg-cell[2]").text, "Wrong Habit Name"
+                    else:
+                        ct = ct+1
+                        xp = "//zg-body/zg-row[{}]/zg-cell[2]".format(ct)
+                        try:
+                            WebDriverWait(driver, 10).until(
+                                EC.presence_of_element_located((By.XPATH, xp))
+                            )
+                        except TimeoutException:
+                            # driver.get_screenshot_as_file("create.png")
+                            assert False, ("not create habit")
+
+                        else:
+                            assert habit == driver.find_element_by_xpath(
+                                "(//zg-body/zg-row[not (@hidden)])[last()]/"
+                                "zg-cell[2]").text, "Wrong Habit Name"
 
                 # log_button
                 log_button = driver.find_elements_by_xpath(
@@ -989,7 +1186,7 @@ class TestHabit():
                 tmp = tmp - 1
         print("close website")
         time.sleep(3)
-        # self.driver.close()
+        self.driver.close()
 
 
 class TestWithoutLogIn():
