@@ -9,7 +9,7 @@ import app
 import multiprocessing
 
 options = webdriver.ChromeOptions()
-# options.add_argument('-headless')
+options.add_argument('-headless')
 
 
 def expand_shadow_element(driver, element):

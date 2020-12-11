@@ -11,7 +11,7 @@ from selenium.common.exceptions import WebDriverException
 import multiprocessing
 
 options = webdriver.ChromeOptions()
-# options.add_argument('--headless')
+options.add_argument('--headless')
 
 
 def run_server():
