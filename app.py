@@ -101,10 +101,9 @@ def delete_habit():
 @app.route('/api/habits/all_logs', methods=['GET'])
 def get_all_activites():
     """Get all activities for a user."""
-    username = current_user.username
-    result = db_manager.get_all_activities(username)
+    result = db_manager.get_all_activities(current_user)
     if result.is_ok():
-        return result.unwrap()
+        return json.dumps(result.unwrap())
     else:
         return "Cannot get habit logs", 404
 
@@ -138,6 +137,7 @@ def add_activites():
         habitname=request.form['habitname'],
         timestamp=timestamp
     )
+
     result = db_manager.add_activity(activity)
     if result.is_ok():
         return "add activity successful", 200

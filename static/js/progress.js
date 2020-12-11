@@ -51,7 +51,7 @@ async function renderHabitCharts() {
   var dates = getRelevantDates(new Date());
   // Get root node within which we will insert new html elements.
   var root = document.getElementById('zing-placeholder');
-  
+
   // Handle the case that the user has no habits yet.
   if (habitList.length == 0) {
     // Add a header specifying no habits yet added to the DOM.
@@ -60,6 +60,20 @@ async function renderHabitCharts() {
     header.appendChild(headerText);
     root.appendChild(header);
   }
+
+  // turn streaks for each activity into scaled color values
+  for (const [_, activities] of Object.entries(habitList)) {
+    var max_streak = activities[0][1];
+    for (i = 0; i < activities.length; i++) {
+      if (max_streak < activities[i][1]) {
+        max_streak = activities[i][1];
+      }
+    }
+    for (i = 0; i < activities.length; i++) {
+      activities[i][1] = 6*activities[i][1]/max_streak+1
+    }
+  }
+  
   // Sort the habitList alphabetically
   const orderedHabitList = {};
   Object.keys(habitList).sort().forEach(function(key) {
@@ -109,6 +123,9 @@ async function renderHabitCharts() {
       marginLeft:'10%',
       marginRight:'10%'
     },
+    tooltip: {
+      visible: false
+    }
     /* adds day labels to calender boxes
        plot: {
       valueBox: { // Use this object to configure the value boxes.
@@ -125,7 +142,7 @@ async function renderHabitCharts() {
   }
   
   // populate the dropdown with the habit names/ids
-    var select = document.getElementById("habit-select");
+  var select = document.getElementById("habit-select");
   var i;
   for(i = 0; i < habit_names.length; i++)
   {
@@ -137,7 +154,16 @@ async function renderHabitCharts() {
   
   // show the first elem by default
   var rendered = document.getElementsByClassName('habit-rendered');
-  rendered[0].style.display = 'block';
+  if(rendered.length > 0)
+  {
+	rendered[0].style.display = 'block';
+	select.style.display = 'inline-block';
+  }
+  else
+  {
+	  var prompt = document.getElementById('prompt');
+	  prompt.innerHTML = 'No habits to display. To create a new habit, use the <b>Create New Habit</b> button from the habit log.';
+  }
   
   // add the selection dropdown handler
   select.addEventListener('change', function(e){
