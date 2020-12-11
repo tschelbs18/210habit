@@ -71,7 +71,7 @@ class DBManager():
     def get_habits(self, user):
         """Get habits for a particular user.
 
-        :param user User: [description]
+        :param user User: user to get habits from
         :returns Result: operation result, Ok or Err
         """
         # make sure user exists
@@ -148,43 +148,50 @@ class DBManager():
 
             return Result.Ok()
 
-    def get_all_activities(self, user):
+    def get_all_activities(self, user, trailing_days=100):
         """Get all the activities for a particular habit.
 
-        :param str username: username to query.
+        :param user User: user to get habits from
         :return Result: operation result, Ok or Err
         """
-        # make sure user exists
-        if not self.does_user_exist(user):
-            return Result.Err("User does not exist, cannot get habits")
+        result = self.get_habits(user)
 
-        trailing_days = 100
-        query = self._session.query(UserActivity).filter(
-            UserActivity.username == user)
+        if not result.is_ok():
+            return result
 
-        end_time = datetime.datetime.now()
-        start_time = end_time - datetime.timedelta(days=trailing_days)
-        query = query.filter(
-            UserActivity.timestamp > start_time,
-            UserActivity.timestamp < end_time)
+        activities_and_streaks = []
+        # Get all activities+streaks for all habits
+        for habit in result.unwrap():
+            activity_result = self.get_activities(habit, trailing_days=None)
+            activities = activity_result.unwrap()
 
-        activities = query.all()
+            for activity in activities:
+                streak = get_activity_streak(
+                    activities, current_date=activity.timestamp)
+                activities_and_streaks.append((activity, streak))
 
-        habits = self._session.query(UserHabit).filter_by(
-            username=user).all()
+        # filter for activities within last trailing_days
+        cutoff_date = \
+            datetime.datetime.now() - datetime.timedelta(days=trailing_days)
 
-        # Key is habitname and values is an array of timestamps and 1s
+        activities_and_streaks = list(filter(
+            lambda x: x[0].timestamp > cutoff_date, activities_and_streaks
+        ))
+
+        # Build dictionary of activity and streak in format that ZingGrid
+        # expects
         activity_dict = {}
-        for activity in activities:
+        for activity, streak in activities_and_streaks:
             if activity.habitname in activity_dict:
                 activity_dict[activity.habitname].append(
-                    [activity.timestamp.strftime("%Y-%m-%d"), 1])
+                    (activity.timestamp.strftime("%Y-%m-%d"), streak))
             else:
                 activity_dict[activity.habitname] = \
-                    [[activity.timestamp.strftime("%Y-%m-%d"), 1]]
-        for habit in habits:
-            if habit.habitname not in activity_dict:
-                activity_dict[habit.habitname] = []
+                    [(activity.timestamp.strftime("%Y-%m-%d"), streak)]
+
+        # remove duplicates
+        for habitname, entries in activity_dict.items():
+            activity_dict[habitname] = sorted(list(set(entries)))
 
         return Result.Ok(activity_dict)
 

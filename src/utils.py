@@ -17,7 +17,7 @@ def is_valid_email_addr(addr):
         return False
 
 
-def get_activity_streak(activities):
+def get_activity_streak(activities, current_date=datetime.now()):
     """Get the current activity streak.
 
     An activity streak is defined as the number of previous
@@ -35,21 +35,23 @@ def get_activity_streak(activities):
 
     # remove duplicates and sort
     # it is possible that there could be two logs in a single day
+    dates = list(filter(lambda date: date <= current_date, dates))
     dates = sorted(list(set(dates)), reverse=True)
 
-    today = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
-    day_to_check = today
+    current_date = datetime.strptime(
+        current_date.strftime("%Y-%m-%d"), "%Y-%m-%d")
+    day_to_check = current_date
     streak = 0
 
     for date in dates:
         if day_to_check - date == timedelta(days=0):
             # check that there is an activity entry for an expected day
             day_to_check -= timedelta(days=1)
-        elif today - date == timedelta(days=1):
+        elif current_date - date == timedelta(days=1):
             # streak is still valid if we have not logged anything today
             # but there is a log from yesterday
             day_to_check -= timedelta(days=2)
-        elif today == date:
+        elif current_date == date:
             day_to_check -= timedelta(days=1)
         else:
             break
