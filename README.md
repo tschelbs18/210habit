@@ -1,11 +1,11 @@
-# 210habit
+# 210habit ![Python application](https://github.com/tschelbs18/210habit/workflows/Python%20application/badge.svg) ![Jest Tests](https://github.com/tschelbs18/210habit/workflows/Jest%20Tests/badge.svg)
 Habit and Activity Tracker Web App for CSE210
 
 ## Getting Started ##
 
 1. Install Python 3
 
-2. Initialize a virtual environment (this will keep installed files within the virtual environment, not affecting the global python libraries)
+2. Initialize a virtual environment (this will keep installed files within the virtual environment, not affecting the global python libraries) in the 210 habit branch root directory
 
 `python -m venv env`
 
@@ -15,10 +15,10 @@ Habit and Activity Tracker Web App for CSE210
 `pip install -r requirements.txt`
 
 4. Test the application
-[todo] `python test/*`
+`pytest`
 
 5. Run the server
-`python application.py`
+`python app.py`
 
 6. Verify the server is working
 in your browser, visit 127.0.0.1:5000.

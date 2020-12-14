@@ -24,7 +24,7 @@ function log_callback(handler, manager, e)
 		var new_streak = parseInt(streak.getAttribute('value')) + 1;
 		streak.setAttribute('value',new_streak.toString());
 		streak.innerHTML = "🔥 " + new_streak;
-		
+
 		manager.logHabit(habit);
 	}
 }
@@ -116,7 +116,7 @@ class HabitManager {
 					"habit": habit,
 					"streak": 0
 				});
-				
+
 				mgr.habits.push(habit);
 		  })
 		  .catch(function (error) {
@@ -234,7 +234,7 @@ window.addEventListener('load', (event) => {
 
 	zgRef.executeOnLoad(async function() {
 		manager.requestHabits();
-		
+
 		// request habit logs to ensure we disable the log button
 		var habitList = await requestHabitLogs();
 
@@ -243,7 +243,7 @@ window.addEventListener('load', (event) => {
 		var localTime = today.getTime();
 		today = new Date(localTime - localOffset);
 		var timestamp = today.toISOString().split('T')[0]; // YYYY-MM-DD format
-		
+
 		var already_logged = [];
 		for (var habitname of Object.keys(habitList)) {
 			dates = habitList[habitname];
@@ -257,11 +257,11 @@ window.addEventListener('load', (event) => {
 				}
 			}
 		}
-		
+
 		console.log("Already logged: " + already_logged);
-		
+
 		await new Promise(resolve => setTimeout(resolve, 100));
-		
+
 		habits = [];
 		log_buttons = [];
 		//iterate over all habits, pulling the habit values
@@ -270,7 +270,7 @@ window.addEventListener('load', (event) => {
 			habits.push(habit_row.textContent);
 			log_buttons.push(habit_row.previousElementSibling.firstElementChild.firstElementChild);
 		});
-		
+
 		already_logged.forEach(function(habit) {
 			var button_to_disable = habits.indexOf(habit);
 			if(button_to_disable != -1) {
@@ -278,7 +278,7 @@ window.addEventListener('load', (event) => {
 				log_buttons[button_to_disable].disabled = true;
 			}
 		});
-		
+
 		document.getElementById('loader-page').style.display='none';
 		document.getElementById('loader-spinner').style.display='none';
 	});
@@ -294,7 +294,7 @@ window.addEventListener('load', (event) => {
 		console.log('Habit deleted: ' + e.detail.ZGData.data.habit);
 		manager.deleteHabit(e.detail.ZGData.data.habit);
 	});
-	
+
 	zgRef.addEventListener('data:record:insert', async (e) => {
 		console.log('Habit created: ' + e.detail.ZGData.data.habit);
 		document.getElementById('loader-page').style.display='none';
@@ -305,7 +305,7 @@ window.addEventListener('load', (event) => {
 				log_callback(handler, manager, e);
 		});
 	});
-	
+
 	// bind callback for create new habit button
 	var btn = document.getElementById('add');
 	btn.addEventListener("click", function add(e) {
