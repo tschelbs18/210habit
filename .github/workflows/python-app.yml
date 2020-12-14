@@ -27,13 +27,14 @@ jobs:
       run: |
         flake8 . --count --show-source --statistics
 
-    - name: Test with pytest
-      run: |
-        pytest
-
     - name: Check Python DocStrings
       run: |
         pydocstyle
+
+    - name: Python code pytest & coverage report
+      run: |
+        coverage run -m pytest
+        coverage report --include=./* -m
 
     - name: Build JSDoc
       uses: andstor/jsdoc-action@v1
