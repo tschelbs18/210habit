@@ -2,7 +2,7 @@ test('Verify create habit button callback fires on nonempty input', async () => 
 
 	const fs = require('fs');
 	const path = require('path');
-	const html = fs.readFileSync(path.resolve(__dirname, '../templates/habits.html'), 'utf8');
+	const html = fs.readFileSync(path.resolve(__dirname, '../../templates/habits.html'), 'utf8');
 
 	// Set up our document body
 	document.body.innerHTML = html;
