@@ -30,19 +30,19 @@ test('Verify create habit button callback fires on nonempty input', async () => 
 	const spy = jest.spyOn(manager, 'addHabit');
 
 	expect(spy).not.toHaveBeenCalled();
-
+	
 	var habit_input = document.getElementById('new-habit');
-
+	
 	habit_input.value = '';
-
+	
 	btn.click();
-
-	expect(spy).not.toHaveBeenCalled();
-
+	
+	expect(spy).not.toHaveBeenCalled();	
+	
 	habit_input.value = 'test';
-
+	
 	btn.click();
-
+	
 	expect(spy).toHaveBeenCalled();
 
 });
