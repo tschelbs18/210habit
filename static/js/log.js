@@ -230,7 +230,7 @@ async function requestHabitLogs()
 window.addEventListener('load', (event) => {
 	const zgRef = document.querySelector('zing-grid');
 
-	let manager = new HabitManager(zgRef);
+	let manager = new HabitManager();
 
 	zgRef.executeOnLoad(async function() {
 		manager.requestHabits();
