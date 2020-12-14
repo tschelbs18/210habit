@@ -27,15 +27,11 @@ jobs:
       run: |
         flake8 . --count --show-source --statistics
 
-    - name: Test with pytest
-      run: |
-        pytest
-
     - name: Check Python DocStrings
       run: |
         pydocstyle
 
-    - name: Python code coverage report
+    - name: Python code pytest & coverage report
       run: |
         coverage run -m pytest
         coverage report --include=./* -m
