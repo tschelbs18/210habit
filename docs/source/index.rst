@@ -6,10 +6,28 @@
 Welcome to 210HabitTracker's documentation!
 ===========================================
 
+.. automodule:: app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: db_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: db_models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. toctree::
    :maxdepth: 4
-
-   habit_server
 
 
 
