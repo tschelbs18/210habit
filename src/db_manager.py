@@ -160,7 +160,7 @@ class DBManager():
             return result
 
         activities_and_streaks = []
-        # Get all activities+streaks for all habits
+        # Get all activities + streaks for all habits
         for habit in result.unwrap():
             activity_result = self.get_activities(habit, trailing_days=None)
             activities = activity_result.unwrap()
@@ -188,6 +188,10 @@ class DBManager():
             else:
                 activity_dict[activity.habitname] = \
                     [(activity.timestamp.strftime("%Y-%m-%d"), streak)]
+
+        for habit in result.unwrap():
+            if habit.habitname not in activity_dict:
+                activity_dict[habit.habitname] = [()]
 
         # remove duplicates
         for habitname, entries in activity_dict.items():

@@ -47,7 +47,7 @@ class UserHabit(db.Model):
 
 
 class UserActivity(db.Model):
-    """Databse ORM model representing a single activity."""
+    """Database ORM model representing a single activity."""
 
     __tablename__ = "user_activities"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
