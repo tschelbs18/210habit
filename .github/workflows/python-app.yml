@@ -39,7 +39,7 @@ jobs:
     - name: Build JSDoc
       uses: andstor/jsdoc-action@v1
       with:
-        source_dir: src
+        source_dir: static/js
         recurse: true
         output_dir: docs/build
 

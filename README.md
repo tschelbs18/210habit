@@ -108,3 +108,5 @@ GET /habits
 
 ### Render progress page  ###
 GET /progress
+## Documentation ##
+For additional documentation on underlying code, check out the "docs" directory.
