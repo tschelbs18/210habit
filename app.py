@@ -25,13 +25,13 @@ login_manager.login_message_category = "message"
 
 # db
 db.init_app(app)
-db.create_all()
 # TODO using a local db.session might be a better idea
 db_manager = DBManager(db.session)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'db.sqlite')
+db.create_all()
 
 
 @login_manager.unauthorized_handler
