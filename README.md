@@ -2,6 +2,7 @@
 Habit and Activity Tracker Web App for CSE210
 
 ## Getting Started ##
+*Note: We recommend using Chrome as the browser for using this application for the best experience*
 
 1. Install Python 3
 
@@ -11,11 +12,18 @@ Habit and Activity Tracker Web App for CSE210
 
 *Note: this may hang for a few seconds*
 
+3. Activate your virtual environment
+On Windows: `env\scripts\activate`
+On Mac: `source env/bin/activate`
+
 3. Install the required modules into your virtual environment
 `pip install -r requirements.txt`
 
 4. Test the application
-`pytest`
+`pytest --ignore=test/test__selenium_habit.py --ignore=test/test__selenium_login.py`
+
+*Note: we ignore running end-to-end tests by default as they require the chromedriver to be setup on your local machine, however they are run by the repo CLI*
+
 
 5. Run the server
 `python app.py`
